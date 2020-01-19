@@ -26,29 +26,7 @@
       </div>
       <app-modal v-model="showInputForm" title="交通費入力">
         <template v-slot:body>
-          <app-form>
-            <app-field label="日付">
-              <input type="text" v-model="selected.date" />
-            </app-field>
-            <app-field label="FROM">
-              <input type="text" v-model="selected.from" />
-            </app-field>
-            <app-field label="FROM">
-              <app-select
-                :options="[{label:'往復', value:'arrows-alt-h'},{label:'片道', value:'long-arrow-alt-right'}]"
-              />
-            </app-field>
-            <app-field label="TO">
-              <input type="text" v-model="selected.to" />
-            </app-field>
-            <app-field>
-              <textarea class="k-textarea" placeholder="備考" rows="5" v-model="selected.memo"></textarea>
-            </app-field>
-            <div class="k-form__btns">
-              <app-btn label="削除" />
-              <app-btn label="更新" />
-            </div>
-          </app-form>
+          <k-form :data="selected"/>
         </template>
       </app-modal>
     </template>
@@ -59,9 +37,7 @@ import { Component, Vue } from "vue-property-decorator";
 import AppLayout from "@/components/Layout.vue";
 import AppBtn from "@/components/Btn.vue";
 import AppModal from "@/components/Modal.vue";
-import AppForm from "@/components/Form.vue";
-import AppField from "@/components/Field.vue";
-import AppSelect from "@/components/Select.vue";
+import KForm from "@/components/KotsuhiForm.vue"
 import { Input } from "@/types/index";
 
 @Component({
@@ -69,9 +45,7 @@ import { Input } from "@/types/index";
     AppLayout,
     AppBtn,
     AppModal,
-    AppField,
-    AppForm,
-    AppSelect
+    KForm
   }
 })
 export default class Main extends Vue {

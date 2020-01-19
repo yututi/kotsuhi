@@ -3,7 +3,7 @@
     <input
       type="text"
       class="k-select__selected"
-      :value="selected"
+      :value="label"
       readonly
       @focus="focused = true"
       @blur="focused = false"
@@ -11,9 +11,9 @@
     <div class="k-select__options k-options">
       <div
         class="k-options__item"
-        v-for="(option, idx) in options"
+        v-for="option in options"
         :key="option.value"
-        @click="selectedIdx = idx"
+        @mousedown="selected(option)"
       >{{option.label}}</div>
     </div>
   </div>
@@ -22,19 +22,34 @@
 import { Component, Vue, Prop } from "vue-property-decorator";
 import Btn from "@/components/Btn.vue";
 
+interface Option {
+  label: string;
+  value: string;
+}
+
 @Component
 export default class Select extends Vue {
   @Prop({ type: Array, required: true })
-  options!: { label: string; value: string }[];
-  value: string = "";
-  selectedIdx: number = -1;
+  options!: Option[];
+
+  @Prop({ type: String, required: false, default: "" })
+  value!: string;
+
+  get label() {
+    return this.options.find(option => option.value == this.value)!.label;
+  }
+
   focused = false;
 
-  get selected() {
-    if (this.selectedIdx >= 0) {
-      return this.options[this.selectedIdx].label;
-    }
-    return "";
+  selected(option: Option) {
+    this.focused = false;
+    this.$emit("input", option.value);
+  }
+
+  delayedOutFocus() {
+    this.$nextTick(() => {
+      this.focused = false;
+    });
   }
 
   get selectCls() {
@@ -75,7 +90,7 @@ export default class Select extends Vue {
 
   &__item {
     padding: 5px;
-    user-select: none;
+    cursor: default;
     &:hover {
       background-color: #cde0ff;
     }
