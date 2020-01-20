@@ -1,6 +1,6 @@
 <template>
   <div :class="modalCls" class="k-modal" @click="onclick($event)">
-    <div class="k-modal__dialog k-dialog" @click.stop>
+    <div class="k-modal__dialog k-dialog k-shadow" @click.stop>
       <div class="k-dialog__header">
         <span class="k-dialog__header-title">{{title}}</span>
         <fa-icon class="k-icon" icon="times-circle" @click="onclick($event)" />
@@ -43,6 +43,7 @@ export default class Modal extends Vue {
 }
 </script>
 <style lang="scss">
+@import "../styles/base.scss";
 .k-modal {
   position: fixed;
   display: flex;
@@ -51,7 +52,7 @@ export default class Modal extends Vue {
   align-items: center;
   justify-content: center;
   height: 100vh;
-  width: 100vw;
+  width: 100%;
   z-index: 100;
   background-color: rgba(0, 0, 0, 0.2);
   visibility: hidden;
@@ -68,15 +69,20 @@ export default class Modal extends Vue {
 }
 
 .k-dialog {
+  box-sizing: border-box;
+  min-width: 300px;
+  width: 70%;
+  max-width: 500px;
+  
+  @include sp {
+    width: 100%;
+  }
   transform: scale(0.2);
   display: flex;
   flex-direction: column;
   background-color: white;
   border-radius: 5px;
-  min-width: 300px;
   overflow: hidden;
-  box-shadow: 0 3px 4px 0 rgba(0, 0, 0, 0.2), 0 3px 3px -2px rgba(0, 0, 0, 0.14),
-    0 1px 8px 0 rgba(0, 0, 0, 0.12);
 
   transition: transform 0.1s;
 

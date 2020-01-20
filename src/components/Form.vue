@@ -13,6 +13,7 @@ export default class Form extends Vue {
 </script>
 <style lang="scss">
 .k-form {
+
   .k-field:not(:first-child) {
     margin-top: 5px;
   }

@@ -4,13 +4,13 @@
       <app-datepicker v-model="date" :baseDate="baseDate" />
     </app-field>
     <app-field label="出発">
-      <input type="text" v-model="modifiedData.from" />
+      <input type="text" maxlength="10" v-model="modifiedData.from" />
     </app-field>
     <app-field label=" ">
       <app-select :options="options" v-model="modifiedData.dirIcon" />
     </app-field>
     <app-field label="到着">
-      <input type="text" v-model="modifiedData.to" />
+      <input type="text" maxlength="10" v-model="modifiedData.to" />
     </app-field>
     <app-field label="費用">
       <input type="number" v-model="modifiedData.cost" />

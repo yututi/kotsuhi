@@ -1,7 +1,7 @@
 <template>
   <div class="k-datepicker" :class="pickerCls" @click.stop>
     <input type="text" readonly :value="dispVal" @focus="focused = true" @blur="onBlur" />
-    <div class="k-datepicker__calendar k-calendar">
+    <div class="k-datepicker__calendar k-calendar k-shadow">
       <div class="k-calendar__row" v-for="(row, ridx) in rows" :key="'r'+ridx">
         <div
           class="k-calendar__cell k-cell"
@@ -177,6 +177,7 @@ export default class DatePicker extends Vue {
 .k-datepicker {
   display: inline-block;
   position: relative;
+  width: 100%;
 
   &__calendar {
     position: absolute;

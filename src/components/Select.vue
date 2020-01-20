@@ -8,7 +8,7 @@
       @focus="focused = true"
       @blur="focused = false"
     />
-    <div class="k-select__options k-options">
+    <div class="k-select__options k-options k-shadow">
       <div
         class="k-options__item"
         v-for="option in options"
@@ -67,6 +67,7 @@ export default class Select extends Vue {
 <style lang="scss">
 .k-select {
   position: relative;
+  width: 100%;
   &__options {
     position: absolute;
     visibility: hidden;

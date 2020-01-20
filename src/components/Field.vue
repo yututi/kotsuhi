@@ -63,6 +63,7 @@ input {
   border: 1px solid transparent;
   outline: none;
   background-color: #eeeeee;
+  width: 100%;
 
   &:focus {
     background-color: #ffffff;

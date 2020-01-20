@@ -80,7 +80,7 @@ export default class Main extends Vue {
   async updateList() {
     const inputs = await db.inputs
       .where("date")
-      .between(firstDayOfMonth(this.baseDate), lastDayOfMonth(this.baseDate))
+      .between(firstDayOfMonth(this.baseDate), lastDayOfMonth(this.baseDate), true, true)
       .sortBy("date");
     this.inputList = inputs.map(fromEntity);
   }
