@@ -16,8 +16,8 @@
       <textarea class="k-textarea" placeholder="備考" rows="5" v-model="modifiedData.memo"></textarea>
     </app-field>
     <div class="k-form__btns">
-      <app-btn label="削除" @click="onDelete" />
-      <app-btn label="更新" @click="onUpdate" />
+      <app-btn v-if="data.id" label="削除" @click="onDelete" />
+      <app-btn :label="data.id?'更新':'登録'" @click="onUpdate" />
     </div>
   </app-form>
 </template>
@@ -44,7 +44,7 @@ const options = [
 })
 export default class KotsuhiForm extends Vue {
   @Prop({ required: false })
-  data!: Input;
+  data?: Input;
 
   modifiedData: Input | {} = {};
 
@@ -56,12 +56,14 @@ export default class KotsuhiForm extends Vue {
     this.$emit("update", this.modifiedData);
   }
   onDelete() {
-    this.$emit("delete");
+    if (this.data) {
+      this.$emit("delete", this.data.id);
+    }
   }
 
   @Watch("data")
   onDataChanged(newVal: Input) {
-    this.modifiedData = { ...newVal };
+    this.modifiedData = { ...newVal }; // shallow copy
   }
 }
 </script>

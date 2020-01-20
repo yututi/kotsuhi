@@ -36,6 +36,9 @@ export default class Select extends Vue {
   value!: string;
 
   get label() {
+    if (!this.value) {
+      return "";
+    }
     return this.options.find(option => option.value == this.value)!.label;
   }
 
