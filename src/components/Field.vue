@@ -23,7 +23,7 @@ export default class Field extends Vue {
 <style lang="scss">
 .k-field {
   display: flex;
-  align-items: baseline;
+  align-items: center;
 
   &__label {
     flex-basis: 0;

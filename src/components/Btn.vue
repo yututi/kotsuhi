@@ -1,5 +1,10 @@
 <template>
-  <button class="btn" :class="btnClasses" @click.prevent="onclick($event)">{{label}}</button>
+  <button
+    class="btn"
+    :class="btnClasses"
+    :tabindex="focusable?0:-1"
+    @mousedown="onclick($event)"
+  >{{label}}</button>
 </template>
 <script lang="ts">
 import { Component, Vue, Prop } from "vue-property-decorator";
@@ -14,6 +19,9 @@ export default class Btn extends Vue {
 
   @Prop({ type: Boolean, default: false })
   outline!: boolean;
+
+  @Prop({ type: Boolean, default: true })
+  focusable!: boolean;
 
   get btnClasses() {
     return {

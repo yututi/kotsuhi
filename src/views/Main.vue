@@ -27,10 +27,9 @@
       <div class="k-adder" @click="addInput">
         <fa-icon class="k-adder__icon" icon="plus-circle" />
       </div>
-      <app-calendar v-model="baseDate" />
       <app-modal v-model="showInputForm" title="交通費入力">
         <template v-slot:body>
-          <k-form :data="selected" @update="onCreateOrUpdate" @delete="onDelete" />
+          <k-form :data="selected" @update="onCreateOrUpdate" @delete="onDelete" :baseDate="baseDate" />
         </template>
       </app-modal>
     </template>
@@ -46,7 +45,6 @@ import { Input } from "@/types/index";
 import db, { InputEntity } from "@/store";
 import { firstDayOfMonth, lastDayOfMonth } from "@/utils";
 
-import AppCalendar from "@/components/DatePicker.vue"
 
 function fromEntity(entity: InputEntity): Input {
   const date = entity.date.getDate();
@@ -64,8 +62,7 @@ function toEntity(input: Input, baseDate: Date): InputEntity {
     AppLayout,
     AppBtn,
     AppModal,
-    KForm,
-    AppCalendar
+    KForm
   }
 })
 export default class Main extends Vue {
@@ -105,7 +102,7 @@ export default class Main extends Vue {
     this.showInputForm = false;
   }
   async addInput() {
-    const maxDate = Math.max(...this.inputList.map(input => input.date)) + 1;
+    const maxDate = Math.max(0, ...this.inputList.map(input => input.date)) + 1;
     const lastDate = lastDayOfMonth(this.baseDate).getDate();
     const newDate = maxDate > lastDate ? lastDate : maxDate;
     this.selected = {

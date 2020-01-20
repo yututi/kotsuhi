@@ -1,16 +1,19 @@
 <template>
   <app-form v-if="data">
     <app-field label="日付">
-      <input type="text" v-model="modifiedData.date" />
+      <app-datepicker v-model="date" :baseDate="baseDate" />
     </app-field>
-    <app-field label="FROM">
+    <app-field label="出発">
       <input type="text" v-model="modifiedData.from" />
     </app-field>
-    <app-field label="FROM">
+    <app-field label=" ">
       <app-select :options="options" v-model="modifiedData.dirIcon" />
     </app-field>
-    <app-field label="TO">
+    <app-field label="到着">
       <input type="text" v-model="modifiedData.to" />
+    </app-field>
+    <app-field label="費用">
+      <input type="number" v-model="modifiedData.cost" />
     </app-field>
     <app-field>
       <textarea class="k-textarea" placeholder="備考" rows="5" v-model="modifiedData.memo"></textarea>
@@ -27,6 +30,7 @@ import AppBtn from "@/components/Btn.vue";
 import AppForm from "@/components/Form.vue";
 import AppField from "@/components/Field.vue";
 import AppSelect from "@/components/Select.vue";
+import AppDatepicker from "@/components/DatePicker.vue";
 import { Input } from "@/types/index";
 
 const options = [
@@ -39,14 +43,27 @@ const options = [
     AppBtn,
     AppField,
     AppForm,
-    AppSelect
+    AppSelect,
+    AppDatepicker
   }
 })
 export default class KotsuhiForm extends Vue {
   @Prop({ required: false })
   data?: Input;
 
-  modifiedData: Input | {} = {};
+  @Prop({ required: true })
+  baseDate!: Date;
+
+  modifiedData: Input | { date: number } = { date: 1 };
+
+  get date() {
+    const date = this.modifiedData.date;
+    return date ? [date] : [];
+  }
+
+  set date(value) {
+    this.modifiedData.date = value[0];
+  }
 
   get options() {
     return options;

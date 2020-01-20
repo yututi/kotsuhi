@@ -1,5 +1,6 @@
 <template>
-  <div class="k-datepicker">
+  <div class="k-datepicker" :class="pickerCls" @click.stop>
+    <input type="text" readonly :value="dispVal" @focus="focused = true" @blur="onBlur" />
     <div class="k-datepicker__calendar k-calendar">
       <div class="k-calendar__row" v-for="(row, ridx) in rows" :key="'r'+ridx">
         <div
@@ -7,15 +8,13 @@
           :class="cellCls(cell, cidx)"
           v-for="(cell, cidx) in row.cells"
           :key="`r${ridx}_c${cidx}`"
-          @click="onCellSelected(cell)"
-        >
-          <template v-if="cell.date">{{cell.date}}</template>
-        </div>
+          @mousedown="onCellSelected(cell)"
+        >{{cell.date||""}}</div>
       </div>
-    </div>
-    <div class="k-datepicker__btns">
-      <app-btn label="クリア" />
-      <app-btn label="決定" />
+      <div class="k-calendar__btns">
+        <app-btn :focusable="false" label="クリア" @click="onClearSelected" />
+        <app-btn :focusable="false" label="決定" @click="onOkClicked" />
+      </div>
     </div>
   </div>
 </template>
@@ -38,26 +37,44 @@ interface Row {
 })
 export default class DatePicker extends Vue {
   @Prop({ type: Date, required: true })
-  value!: Date;
+  baseDate!: Date;
 
-  selected: number[] = [];
+  @Prop({ type: Boolean, default: false })
+  multiple!: boolean;
+
+  @Prop({ default: () => [] })
+  value!: number[];
+
+  get selected() {
+    return this.value;
+  }
+
+  set selected(value) {
+    this.$emit("input", value);
+  }
+
+  focused = false;
+
+  get dispVal() {
+    return this.selected.sort((a, b) => a - b).join(" ");
+  }
 
   get month(): number {
-    return this.value.getMonth();
+    return this.baseDate.getMonth();
   }
 
   get lastDate(): number {
     return new Date(
-      this.value.getFullYear(),
-      this.value.getMonth() + 1,
+      this.baseDate.getFullYear(),
+      this.baseDate.getMonth() + 1,
       0
     ).getDate();
   }
 
   get firstDay(): number {
     return new Date(
-      this.value.getFullYear(),
-      this.value.getMonth(),
+      this.baseDate.getFullYear(),
+      this.baseDate.getMonth(),
       1
     ).getDay();
   }
@@ -92,6 +109,12 @@ export default class DatePicker extends Vue {
     return rows;
   }
 
+  get pickerCls() {
+    return {
+      "k-datepicker--focused": this.focused
+    };
+  }
+
   cellCls(cell: Cell, idx: number) {
     return {
       "k-cell--selectable": !!cell.date,
@@ -102,43 +125,87 @@ export default class DatePicker extends Vue {
   }
 
   onCellSelected(cell: Cell) {
-    console.log(cell);
     if (!cell.date) {
       return;
     }
-    const selected = this.selected;
-    const idx = selected.indexOf(cell.date);
-    console.log(idx);
 
-    if (idx >= 0) {
-      selected.splice(idx, 1);
+    if (this.multiple) {
+      const selected = this.selected;
+      const idx = selected.indexOf(cell.date);
+
+      if (idx >= 0) {
+        selected.splice(idx, 1);
+      } else {
+        selected.push(cell.date);
+      }
     } else {
-      selected.push(cell.date);
+      this.selected = [cell.date];
     }
   }
 
-  onInput(value: Date) {
-    this.$emit("input", value);
+  onClearSelected() {
+    this.selected = [];
+    this.focused = false;
+  }
+
+  onOkClicked() {
+    this.$emit("input", this.selected);
+    this.focused = false;
+  }
+
+  onBlur() {
+    if (!this.multiple) {
+      this.focused = false;
+    }
+  }
+
+  _listener!: any;
+
+  mounted() {
+    this._listener = () => {
+      this.focused = false;
+    };
+    window.addEventListener("click", this._listener);
+  }
+
+  beforeDestroy() {
+    window.removeEventListener("click", this._listener);
   }
 }
 </script>
 <style lang="scss">
 .k-datepicker {
   display: inline-block;
-  border: 1px solid gainsboro;
-  padding: 5px;
+  position: relative;
 
-  &__btns {
-    margin-top: 5px;
-    display: flex;
-    justify-content: flex-end;
+  &__calendar {
+    position: absolute;
+    top: 100%;
+    z-index: 1;
+    margin-top: 1px;
+    visibility: hidden;
+    opacity: 0;
+    transition: 0.3s opacity;
+    background-color: white;
+    min-width: 200px;
+    max-width: 300px;
+    width: 100%;
+  }
+
+  &--focused {
+    .k-calendar {
+      visibility: visible;
+      opacity: 1;
+    }
   }
 }
 .k-calendar {
   border: 1px solid gainsboro;
-  border-radius: 5px;
+  border-radius: 3px;
   box-sizing: border-box;
+  overflow: hidden;
   &__row {
+    box-sizing: border-box;
     display: flex;
     border-bottom: 1px solid gainsboro;
 
@@ -148,17 +215,26 @@ export default class DatePicker extends Vue {
   }
 
   &__cell {
+    box-sizing: border-box;
     border-right: 1px solid gainsboro;
 
     &:last-child {
-      border-right: 0px;
+      border-right: 1px solid transparent;
     }
+  }
+
+  &__btns {
+    margin: 5px;
+    display: flex;
+    justify-content: flex-end;
   }
 }
 .k-cell {
   padding: 0.3em;
   text-align: right;
-  width: 1.5em;
+  flex-basis: 0;
+  flex-grow: 1;
+  flex-shrink: 0;
 
   &--selectable {
     cursor: pointer;
