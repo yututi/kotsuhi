@@ -189,7 +189,7 @@ export default class DatePicker extends Vue {
     transition: 0.3s opacity;
     background-color: white;
     min-width: 200px;
-    max-width: 300px;
+    max-width: 250px;
     width: 100%;
   }
 

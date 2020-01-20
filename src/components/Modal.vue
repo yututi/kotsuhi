@@ -72,10 +72,11 @@ export default class Modal extends Vue {
   box-sizing: border-box;
   min-width: 300px;
   width: 70%;
-  max-width: 500px;
-  
+  max-width: 400px;
+
   @include sp {
-    width: 100%;
+    width: calc(100% - 10px);
+    max-width: calc(100% - 10px);
   }
   transform: scale(0.2);
   display: flex;
