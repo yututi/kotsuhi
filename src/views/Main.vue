@@ -1,7 +1,7 @@
 <template>
   <app-layout>
     <template v-slot:header-btns>
-      <app-btn label="PDF" dark />
+      <app-btn label="PDF" dark @click="download" />
     </template>
     <template v-slot:body>
       <div class="k-card-list">
@@ -29,7 +29,12 @@
       </div>
       <app-modal v-model="showInputForm" title="交通費入力">
         <template v-slot:body>
-          <k-form :data="selected" @update="onCreateOrUpdate" @delete="onDelete" :baseDate="baseDate" />
+          <k-form
+            :data="selected"
+            @update="onCreateOrUpdate"
+            @delete="onDelete"
+            :baseDate="baseDate"
+          />
         </template>
       </app-modal>
     </template>
@@ -44,7 +49,7 @@ import KForm from "@/components/KotsuhiForm.vue";
 import { Input } from "@/types/index";
 import db, { InputEntity } from "@/store";
 import { firstDayOfMonth, lastDayOfMonth } from "@/utils";
-
+import { saveAs } from "file-saver";
 
 function fromEntity(entity: InputEntity): Input {
   const date = entity.date.getDate();
@@ -80,11 +85,23 @@ export default class Main extends Vue {
   async updateList() {
     const inputs = await db.inputs
       .where("date")
-      .between(firstDayOfMonth(this.baseDate), lastDayOfMonth(this.baseDate), true, true)
+      .between(
+        firstDayOfMonth(this.baseDate),
+        lastDayOfMonth(this.baseDate),
+        true,
+        true
+      )
       .sortBy("date");
     this.inputList = inputs.map(fromEntity);
   }
+
+  _worker!: Worker;
   mounted() {
+    this._worker = new Worker("worker.js");
+    this._worker.onmessage = async evt => {
+    //   var saver = await import("file-saver");
+      saveAs(evt.data, `交通費請求書${this.month}月.pdf`);
+    };
     this.updateList();
   }
   async onCreateOrUpdate(newData: Input) {
@@ -114,6 +131,10 @@ export default class Main extends Vue {
       dirIcon: "arrows-alt-h"
     };
     this.showInputForm = true;
+  }
+
+  download() {
+    this._worker.postMessage("");
   }
 }
 </script>

@@ -103,7 +103,7 @@ export default class DatePicker extends Vue {
     const cells = this.cells;
 
     for (let i = 0; i < cells.length; i += 7) {
-      rows.push({ cells: this.cells.slice(i, i + 7) });
+      rows.push({ cells: cells.slice(i, i + 7) });
     }
 
     return rows;
