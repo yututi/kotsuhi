@@ -6,9 +6,9 @@
         <slot name="header-btns" />
       </div>
     </header>
-    <article class="k-layout__body">
+    <div class="k-layout__body">
       <slot name="body" />
-    </article>
+    </div>
   </div>
 </template>
 <script lang="ts">

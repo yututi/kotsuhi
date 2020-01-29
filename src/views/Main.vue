@@ -124,7 +124,8 @@ export default class Main extends Vue {
   }
 
   download() {
-    this._worker.postMessage("");
+    // this._worker.postMessage("");
+    this.$router.push("/pdf")
   }
 }
 </script>
