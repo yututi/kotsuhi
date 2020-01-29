@@ -1,6 +1,6 @@
-var document = { 'createElementNS': function(){ return {} } };
+var document = { 'createElementNS': function () { return {} } };
 var window = this;
-importScripts( 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.62/pdfmake.min.js', 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.62/vfs_fonts.js' );
+importScripts('https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.62/pdfmake.min.js', 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.62/vfs_fonts.js');
 
 self.addEventListener("message", () => {
     console.log("start")
@@ -10,8 +10,7 @@ self.addEventListener("message", () => {
         ]
     }
 
-    pdfMake.createPdf(docDefinition).getBlob((blob)=>{
+    pdfMake.createPdf(docDefinition).getBlob((blob) => {
         self.postMessage(blob)
     });
 })
-

@@ -6,7 +6,7 @@
         <fa-icon class="k-icon" icon="times-circle" @click="onclick($event)" />
       </div>
       <div class="k-dialog__body">
-        <slot name="body" />
+        <slot />
       </div>
     </div>
   </div>
