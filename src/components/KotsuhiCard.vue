@@ -1,7 +1,7 @@
 <template>
   <div class="k-card">
-    <div class="k-card__date">
-      <input type="checkbox" v-model="isChecked"/>
+    <div class="k-card__check">
+      <app-check></app-check>
     </div>
     <div class="k-card__date">{{month}}月{{input.date}}日</div>
     <div class="k-card__divider"></div>
@@ -24,11 +24,13 @@
 <script lang="ts">
 import { Component, Vue, Prop } from "vue-property-decorator";
 import AppBtn from "@/components/Btn.vue";
+import AppCheck from "@/components/Check.vue"
 import { Input } from "@/types/index";
 
 @Component({
   components: {
-    AppBtn
+    AppBtn,
+    AppCheck
   }
 })
 export default class KotsuhiCard extends Vue {
@@ -60,6 +62,10 @@ export default class KotsuhiCard extends Vue {
     &__detail {
       font-size: 12px;
     }
+  }
+
+  &__check {
+    width: 30px;
   }
 
   &__date {

@@ -5,7 +5,7 @@ export interface InputEntity {
     date: Date
     from: string
     to: string
-    cost: number
+    cost: number | null
     memo: string
     dirIcon: string
 }

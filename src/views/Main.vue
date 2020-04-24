@@ -14,8 +14,8 @@
           @modClick="onModBtnClicked"
         />
       </div>
-      <div class="k-adder" @click="addInput">
-        <fa-icon class="k-adder__icon" icon="plus-circle" />
+      <div class="k-adder">
+        <fa-icon @click="addInput" class="k-adder__icon" icon="plus-circle" />
       </div>
       <app-modal v-model="showInputForm" title="交通費入力">
         <k-form
@@ -116,7 +116,7 @@ export default class Main extends Vue {
       date: newDate,
       from: "",
       to: "",
-      cost: 0,
+      cost: null,
       memo: "",
       dirIcon: "arrows-alt-h"
     };

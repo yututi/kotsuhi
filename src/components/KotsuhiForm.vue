@@ -4,16 +4,16 @@
       <app-datepicker v-model="date" :baseDate="baseDate" />
     </app-field>
     <app-field label="出発">
-      <input type="text" maxlength="10" v-model="modifiedData.from" />
+      <input type="text" autocomplete maxlength="10" v-model="modifiedData.from" />
     </app-field>
     <app-field label=" ">
       <app-select :options="options" v-model="modifiedData.dirIcon" />
     </app-field>
     <app-field label="到着">
-      <input type="text" maxlength="10" v-model="modifiedData.to" />
+      <input type="text" autocomplete maxlength="10" v-model="modifiedData.to" />
     </app-field>
     <app-field label="費用">
-      <input type="number" v-model="modifiedData.cost" />
+      <input type="number" autocomplete v-model="modifiedData.cost" />
     </app-field>
     <app-field>
       <textarea class="k-textarea" placeholder="備考" rows="5" v-model="modifiedData.memo"></textarea>
@@ -54,7 +54,10 @@ export default class KotsuhiForm extends Vue {
   @Prop({ required: true })
   baseDate!: Date;
 
-  modifiedData: Input | { date: number } = { date: 1 };
+  modifiedData: Input | { date: number; cost: number | null } = {
+    date: 1,
+    cost: null
+  };
 
   get date() {
     const date = this.modifiedData.date;
@@ -67,6 +70,10 @@ export default class KotsuhiForm extends Vue {
 
   get options() {
     return options;
+  }
+
+  get cost() {
+    return this.modifiedData.cost;
   }
 
   onUpdate() {

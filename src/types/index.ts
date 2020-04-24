@@ -3,7 +3,7 @@ export interface Input {
     date: number
     from: string
     to: string
-    cost: number
+    cost: number | null
     memo: string
     dirIcon: string
 }
