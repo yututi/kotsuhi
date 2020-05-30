@@ -1,6 +1,6 @@
 <template>
   <div class="k-layout">
-    <header class="k-layout__header">
+    <header class="k-layout__header" :class="headerClasses">
       <span class="k-layout__title">交通費精算</span>
       <div class="k-layout__btns">
         <slot name="header-btns" />
@@ -12,20 +12,33 @@
   </div>
 </template>
 <script lang="ts">
-import { Component, Vue, Prop } from "vue-property-decorator";
+import { Component, Mixins, Prop } from "vue-property-decorator";
 import Btn from "@/components/Btn.vue";
+import Themeable from "@/components/mixins/themeable";
 
 @Component({
   components: {
     Btn
   }
 })
-export default class Layout extends Vue {
+export default class Layout extends Mixins(Themeable) {
   @Prop({ type: String, required: false, default: "" })
   label!: string;
 
+  hasMenu!: boolean;
+
+  get headerClasses() {
+    return {
+      ...this.themeClasses
+    };
+  }
+
   onclick(e: any) {
     this.$emit("click", e);
+  }
+
+  mounted() {
+    this.hasMenu = !!this.$slots.menu;
   }
 }
 </script>
@@ -38,11 +51,11 @@ export default class Layout extends Vue {
     padding: 10px;
     align-items: center;
     display: flex;
-    color: white;
     border-bottom: 1px solid gainsboro;
-    background-color: #3367d6;
     border: 1px solid transparent;
-    box-shadow: 0 3px 4px 0 rgba(0,0,0,.2), 0 3px 3px -2px rgba(0,0,0,.14), 0 1px 8px 0 rgba(0,0,0,.12);
+    box-shadow: 0 3px 4px 0 rgba(0, 0, 0, 0.2),
+      0 3px 3px -2px rgba(0, 0, 0, 0.14), 0 1px 8px 0 rgba(0, 0, 0, 0.12);
+    z-index: 1;
   }
 
   &__title {
@@ -52,6 +65,13 @@ export default class Layout extends Vue {
 
   &__body {
     flex: 1;
+    overflow-y: auto;
+    position: relative;
+  }
+
+  &__menu {
+    position: sticky;
+    top: 0px;
   }
 }
 </style>

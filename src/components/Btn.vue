@@ -1,16 +1,16 @@
 <template>
-  <button
-    class="btn"
-    :class="btnClasses"
-    :tabindex="focusable?0:-1"
-    @mousedown="onclick($event)"
-  >{{label}}</button>
+  <div class="btn" :class="btnClasses" :tabindex="focusable?0:-1" @click="onclick($event)">
+    <fa-icon v-if="icon" class="k-btn__icon" :icon="icon" />
+    <slot />
+    {{label}}
+  </div>
 </template>
 <script lang="ts">
-import { Component, Vue, Prop } from "vue-property-decorator";
+import { Component, Mixins, Prop } from "vue-property-decorator";
+import Themeable from "@/components/mixins/themeable";
 
 @Component
-export default class Btn extends Vue {
+export default class Btn extends Mixins(Themeable) {
   @Prop({ type: String, required: false, default: "" })
   label!: string;
 
@@ -23,10 +23,18 @@ export default class Btn extends Vue {
   @Prop({ type: Boolean, default: true })
   focusable!: boolean;
 
+  @Prop({ type: Boolean, default: false })
+  round!: boolean;
+
+  @Prop({ type: String, required: false })
+  icon?: string;
+
   get btnClasses() {
     return {
       "btn--dark": this.dark,
-      "btn--outline": this.outline
+      "btn--outline": this.outline,
+      "btn--round": this.round,
+      ...this.themeClasses
     };
   }
 
@@ -36,45 +44,57 @@ export default class Btn extends Vue {
 }
 </script>
 <style lang="scss">
+@import "@/styles/theme.scss";
+
 .btn {
   // reset button styles
   border: 1px solid transparent;
-  background-color: white;
+  background-color: transparent;
   outline: none;
+  display: inline-flex;
+  user-select: none;
 
   font-size: 17px;
-  padding: 5px 7px;
+  padding: 0px 8px;
+  line-height: 32px;
   border-radius: 4px;
-  color: #3367d6;
   transition: 0.3s background-color;
+  align-items: center;
+
   &:hover {
-    background-color: #cde0ff;
     cursor: pointer;
   }
-  &:active,
-  &:focus {
-    border: 1px solid #3367d6;
+
+  &--round {
+    border-radius: 9999px;
   }
 
-  &--dark {
-    color: white;
-    background-color: #3367d6;
+  & > * {
+    margin-right: 4px;
+  }
+}
+@each $name, $theme in $themes {
+  .btn.k-theme--#{$name}:hover {
+    background-color: lighten(map-get($theme, "bgColor"), 10%);
+    border-color: lighten(map-get($theme, "bgColor"), 10%);
+  }
+
+  .btn.k-theme--#{$name}:active {
+    background-color: darken(map-get($theme, "bgColor"), 5%);
+  }
+
+  .btn--outline.k-theme--#{$name} {
+    background-color: transparent;
+    border: 1px solid map-get($theme, "bgColor");
+    color: map-get($theme, "bgColor");
+
     &:hover {
-      background-color: #4089ff;
-      cursor: pointer;
-    }
-    &:active,
-    &:focus {
-      border: 1px solid white;
+      color: map-get($theme, "color");
     }
 
-    &.btn--outline {
-      border: 1px solid white;
+    &:active {
+      color: map-get($theme, "color");
     }
-  }
-
-  &--outline {
-    border: 1px solid #3367d6;
   }
 }
 </style>

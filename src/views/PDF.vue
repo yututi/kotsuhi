@@ -13,21 +13,10 @@ import AppBtn from "@/components/Btn.vue";
 import AppModal from "@/components/Modal.vue";
 import KForm from "@/components/KotsuhiForm.vue";
 import { Input } from "@/types/index";
-import db, { InputEntity } from "@/store";
 import { firstDayOfMonth, lastDayOfMonth } from "@/utils";
 import { saveAs } from "file-saver";
 import jspdf from "jspdf";
 
-function fromEntity(entity: InputEntity): Input {
-  const date = entity.date.getDate();
-  return { ...entity, date: date };
-}
-function toEntity(input: Input, baseDate: Date): InputEntity {
-  return {
-    ...input,
-    date: new Date(baseDate.getFullYear(), baseDate.getMonth(), input.date)
-  };
-}
 
 @Component({
   components: {

@@ -1,0 +1,22 @@
+$themes : (
+    "primary": (
+        "bgColor" : #2196f3,
+        "color" : white,    
+    ),
+    "success": (
+        "bgColor" : #28e788,
+        "color": white,
+    ),
+    "error": (
+        "bgColor" : #f44336,
+        "color": white,
+    ),
+);
+
+@each $name, $theme in $themes {
+    .k-theme--#{$name} {
+        background-color: map-get($theme, "bgColor");
+        border-color: map-get($theme, "bgColor");
+        color: map-get($theme, "color");
+    }
+}

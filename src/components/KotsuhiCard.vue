@@ -1,31 +1,40 @@
 <template>
-  <div class="k-card">
-    <div class="k-card__check">
-      <app-check></app-check>
+  <div class="k-card" @click="$emit('modClick', input)">
+    <div class="k-card__check" @click.stop>
+      <app-check v-model="input.isChecked"></app-check>
     </div>
-    <div class="k-card__date">{{month}}月{{input.date}}日</div>
+    <div class="k-card__block k-card__head-block k-card-block">
+      <div class="k-card-block__head">{{month}}月{{input.date}}日</div>
+      <div class="k-contact k-card-block__body">{{input.contact || "---"}}</div>
+    </div>
     <div class="k-card__divider"></div>
     <div class="k-card__detail">
-      <div class="k-card__from">{{input.from}}</div>
-      <div class="k-card__arrow">
-        <fa-icon :icon="input.dirIcon" />
+      <div class="k-card-block">
+        <div class="k-card-block__head">{{getTransportation(input)}}</div>
+        <div class="k-card-block__body">
+          <div class="k-card__from">{{input.from||"---"}}</div>
+          <div class="k-card__arrow">
+            <fa-icon :icon="getIcon(input)" />
+          </div>
+          <div class="k-card__to">{{input.to||"---"}}</div>
+        </div>
       </div>
-      <div class="k-card__to">{{input.to}}</div>
-      <div class="k-card__cost">{{input.cost}}円</div>
+      <div class="k-card__cost">{{toLocaleString(input.cost)}} 円</div>
     </div>
-    <div class="k-card__divider"></div>
+    <div class="k-card__divider k-hide-on-sp"></div>
     <div class="k-card__memo">{{input.memo}}</div>
-    <div class="k-card__divider"></div>
-    <div class="k-card__btns">
-      <app-btn label="編集" @click="$emit('modClick', input)" />
-    </div>
   </div>
 </template>
 <script lang="ts">
 import { Component, Vue, Prop } from "vue-property-decorator";
 import AppBtn from "@/components/Btn.vue";
-import AppCheck from "@/components/Check.vue"
-import { Input } from "@/types/index";
+import AppCheck from "@/components/Check.vue";
+import { Input, TransportationTypes } from "@/types/index";
+
+const transportationMap = new Map<string, string>();
+TransportationTypes.forEach(type => {
+  transportationMap.set(type.value, type.label);
+});
 
 @Component({
   components: {
@@ -37,11 +46,23 @@ export default class KotsuhiCard extends Vue {
   @Prop({ type: Object, required: false })
   input!: Input;
 
-  @Prop({type:Number})
-  month! : number;
+  @Prop({ type: Number })
+  month!: number;
 
-  @Prop({ type: Boolean, required: false, default: true })
-  isChecked!: boolean;
+  toLocaleString(num: number) {
+    if (num == null) {
+      return "0";
+    }
+    return num.toLocaleString();
+  }
+
+  getIcon(input: Input) {
+    return input.isRoundTrip ? "exchange-alt" : "long-arrow-alt-right";
+  }
+
+  getTransportation(input: Input) {
+    return transportationMap.get(input.transportation);
+  }
 }
 </script>
 <style lang="scss">
@@ -52,30 +73,41 @@ export default class KotsuhiCard extends Vue {
   align-items: center;
   border: 1px solid gainsboro;
   border-radius: 6px;
-  padding: 10px;
+  padding: 6px;
   color: dimgray;
 
-  @include sp {
-    flex-direction: column;
-    align-items: flex-start;
+  &:hover {
+    border-color: orange;
+    box-shadow: 0 0 4px 1px gainsboro;
+  }
 
-    &__detail {
-      font-size: 12px;
-    }
+  @include sp {
+    padding: 10px;
+    flex-direction: column;
+  }
+
+  &__detail {
+    font-size: 12px;
   }
 
   &__check {
-    width: 30px;
+    width: 40px;
+    height: 40px;
+    margin-right: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    @include sp {
+      display: none;
+    }
   }
 
-  &__date {
-    font-size: 22px;
-    text-align: center;
-    width: 100px;
+  &__head-block {
+    width: 160px;
     @include sp {
       text-align: initial;
-      width: initial;
-      margin-bottom: 5px;
+      width: 100px;
     }
   }
 
@@ -88,17 +120,23 @@ export default class KotsuhiCard extends Vue {
     & > *:not(:first-child) {
       margin-left: 5px;
     }
-    width: 300px;
+    width: 400px;
     @include sp {
       padding-left: 10px;
-      width: 100%;
+      flex: 1;
     }
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__transportation {
+    width: 60px;
   }
 
   &__cost {
     flex: 1;
     text-align: right;
-    min-width: 90px;
   }
 
   &__memo {
@@ -124,9 +162,39 @@ export default class KotsuhiCard extends Vue {
     margin: 0px 10px;
     height: 30px;
     border-left: 1px solid gainsboro;
-    @include sp {
-      display: none;
+  }
+
+  &__from,
+  &__to {
+    min-width: 2em;
+    text-align: center;
+  }
+}
+
+.k-card-block {
+  display:flex;
+  flex-direction: column;
+
+  &__head {
+    font-size: 14px;
+    line-height: 14px;
+  }
+
+  &__body {
+    margin-top: 4px;
+    display: flex;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    & > *:not(:first-child) {
+      margin-left: 5px;
     }
+  }
+}
+
+.k-hide-on-sp {
+  @include sp {
+    display: none;
   }
 }
 </style>

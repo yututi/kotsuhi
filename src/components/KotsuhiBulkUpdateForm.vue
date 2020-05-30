@@ -1,10 +1,16 @@
 <template>
-  <app-form v-if="data">
+  <app-form>
     <app-field label="日付">
-      <app-datepicker v-model="date" :baseDate="baseDate" />
+      <app-datepicker multiple v-model="dates" :baseDate="baseDate" />
     </app-field>
     <app-field label="用務先">
-      <input type="text" autocomplete maxlength="30" v-model="modifiedData.contact" />
+      <input
+        placeholder="変更しない"
+        type="text"
+        autocomplete
+        maxlength="30"
+        v-model="modifiedData.contact"
+      />
     </app-field>
     <app-field label="出発">
       <input type="text" autocomplete maxlength="30" v-model="modifiedData.from" />
@@ -13,7 +19,7 @@
       <input type="text" autocomplete maxlength="30" v-model="modifiedData.to" />
     </app-field>
     <app-field label="交通手段">
-      <app-select class="w-100" :options="options" v-model="modifiedData.transportation"></app-select>
+      <app-select :options="options" v-model="modifiedData.transportation"></app-select>
     </app-field>
     <app-field label="往復">
       <app-check v-model="modifiedData.isRoundTrip"></app-check>
@@ -26,8 +32,7 @@
     </app-field>
     <div class="k-form__btns">
       <app-btn-group>
-        <app-btn v-if="data.id" outline theme="error" label="削除" @click="onDelete" />
-        <app-btn :label="data.id?'更新':'登録'" outline @click="onUpdate" />
+        <app-btn label="更新" outline @click="onUpdate" />
       </app-btn-group>
     </div>
   </app-form>
@@ -60,21 +65,14 @@ const options = TransportationTypes;
 })
 export default class KotsuhiForm extends Vue {
   @Prop({ required: true })
-  data!: Input;
-
-  @Prop({ required: true })
   baseDate!: Date;
 
+  @Prop({ required: true, default: () => [] })
+  selectedDates!: number[];
+
+  dates: number[]=[];
+
   modifiedData: Input = defaultInput();
-
-  get date() {
-    const date = this.modifiedData.date;
-    return date ? [date] : [];
-  }
-
-  set date(value) {
-    this.modifiedData.date = value[0];
-  }
 
   get options() {
     return options;
@@ -91,30 +89,5 @@ export default class KotsuhiForm extends Vue {
   onUpdate() {
     this.$emit("update", this.modifiedData);
   }
-  onDelete() {
-    if (this.data) {
-      this.$emit("delete", this.data.id);
-    }
-  }
-
-  mounted() {
-    this.modifiedData = { ...this.data }; // shallow copy
-  }
 }
 </script>
-<style lang="scss">
-@import "../styles/base.scss";
-.k-form {
-  box-sizing: border-box;
-  width: 30vw;
-  min-width: 340px;
-
-  @include sp {
-    width: 100%;
-    min-width: 240px;
-  }
-}
-.w-100 {
-  width: 100%;
-}
-</style>

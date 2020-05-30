@@ -1,21 +1,12 @@
 import Dexie from "dexie"
-
-export interface InputEntity {
-    id?: number
-    date: Date
-    from: string
-    to: string
-    cost: number | null
-    memo: string
-    dirIcon: string
-}
+import { InputEntity } from "@/types"
 
 class DB extends Dexie {
     inputs: Dexie.Table<InputEntity, number>;
     constructor() {
         super("DB")
         this.version(1).stores({
-            inputs: "++id, date, from, to, cost, memo, dirIcon"
+            inputs: "++id, ymd, contact, from, to, cost, transportation, memo, isRoundTrip"
         });
 
         this.inputs = this.table("inputs")

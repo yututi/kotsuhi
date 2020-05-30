@@ -1,29 +1,29 @@
 <template>
-  <div class="k-check" :class="classes" @click="value = !value">
-    <div class="k-check__inner"></div>
+  <div class="k-check" :class="classes" @click.stop="checked = !value">
+    <!-- <div class="k-check__inner"></div> -->
   </div>
 </template>
 <script lang="ts">
 import { Component, Vue, Prop } from "vue-property-decorator";
 
 @Component
-export default class Btn extends Vue {
+export default class Check extends Vue {
   @Prop({ type: String, required: false, default: "" })
   label!: string;
 
   @Prop({ type: Boolean, default: false })
-  checked!: boolean;
+  value!: boolean;
 
   get classes() {
     return {
       "k-check--checked": this.checked
     };
   }
-  get value() {
-    return this.checked;
+  get checked() {
+    return this.value;
   }
-  set value(value) {
-    this.checked = value
+  set checked(value) {
+    console.log(value);
     this.$emit("input", value);
   }
 }
@@ -35,24 +35,28 @@ export default class Btn extends Vue {
   width: 18px;
   border-radius: 3px;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: inline-flex;
   overflow: hidden;
+  justify-content: center;
+  align-items: center;
+  background-color: lighten(gainsboro, 10%);
+  transition: background-color 0.3s;
 
-  &__inner {
-    background-color: #5089ff;
-    border-radius: 1px;
-    width: 0px;
-    height: 0px;
-    transition: width 0.1s, height 0.1s;
+  // &__inner {
+  //   background-color: #2196f3;
+  //   border-radius: 999px;
+  //   width: 0px;
+  //   height: 0px;
+  //   transition: width 0.1s, height 0.1s;
+  // }
+
+  &:hover {
+    border: 2px solid lighten(#2196f3, 20%);
   }
 
   &--checked {
-    .k-check__inner {
-      width: 100%;
-      height: 100%;
-    }
+  border: 2px solid gainsboro;
+    background-color: #2196f3;
   }
 }
 </style>

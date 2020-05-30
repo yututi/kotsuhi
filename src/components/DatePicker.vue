@@ -2,6 +2,18 @@
   <div class="k-datepicker" :class="pickerCls" @click.stop>
     <input type="text" readonly :value="dispVal" @focus="focused = true" @blur="onBlur" />
     <div class="k-datepicker__calendar k-calendar k-shadow">
+      <div class="k-calendar__header">{{baseDate.getFullYear()}}年 {{baseDate.getMonth()+1}}月</div>
+
+      <div class="k-calendar__row" @click.stop>
+        <div class="k-calendar__cell k-cell">日</div>
+        <div class="k-calendar__cell k-cell">月</div>
+        <div class="k-calendar__cell k-cell">火</div>
+        <div class="k-calendar__cell k-cell">水</div>
+        <div class="k-calendar__cell k-cell">木</div>
+        <div class="k-calendar__cell k-cell">金</div>
+        <div class="k-calendar__cell k-cell">土</div>
+      </div>
+
       <div class="k-calendar__row" v-for="(row, ridx) in rows" :key="'r'+ridx">
         <div
           class="k-calendar__cell k-cell"
@@ -11,9 +23,11 @@
           @mousedown="onCellSelected(cell)"
         >{{cell.date||""}}</div>
       </div>
-      <div class="k-calendar__btns">
-        <app-btn :focusable="false" label="クリア" @click="onClearSelected" />
-        <app-btn :focusable="false" label="決定" @click="onOkClicked" />
+      <div v-if="multiple" class="k-calendar__btns">
+        <app-btn-group>
+          <app-btn outline :focusable="false" label="クリア" @click="onClearSelected" />
+          <app-btn outline :focusable="false" label="決定" @click="onOkClicked" />
+        </app-btn-group>
       </div>
     </div>
   </div>
@@ -21,6 +35,7 @@
 <script lang="ts">
 import { Component, Vue, Prop } from "vue-property-decorator";
 import AppBtn from "@/components/Btn.vue";
+import AppBtnGroup from "@/components/BtnGroup.vue";
 
 interface Cell {
   date?: number;
@@ -32,7 +47,8 @@ interface Row {
 
 @Component({
   components: {
-    AppBtn
+    AppBtn,
+    AppBtnGroup
   }
 })
 export default class DatePicker extends Vue {
@@ -56,7 +72,7 @@ export default class DatePicker extends Vue {
   focused = false;
 
   get dispVal() {
-    return this.selected.sort((a, b) => a - b).join(" ");
+    return this.selected.sort((a, b) => a - b).join(", ");
   }
 
   get month(): number {
@@ -174,6 +190,8 @@ export default class DatePicker extends Vue {
 }
 </script>
 <style lang="scss">
+@import "../styles/base.scss";
+
 .k-datepicker {
   display: inline-block;
   position: relative;
@@ -191,6 +209,13 @@ export default class DatePicker extends Vue {
     min-width: 200px;
     max-width: 250px;
     width: 100%;
+
+    @include sp {
+      top: 0;
+      left: 0;
+      position: fixed;
+      max-width: 100%;
+    }
   }
 
   &--focused {
@@ -205,6 +230,11 @@ export default class DatePicker extends Vue {
   border-radius: 3px;
   box-sizing: border-box;
   overflow: hidden;
+
+  &__header {
+    padding: 4px;
+    text-align: center;
+  }
   &__row {
     box-sizing: border-box;
     display: flex;
@@ -236,6 +266,11 @@ export default class DatePicker extends Vue {
   flex-basis: 0;
   flex-grow: 1;
   flex-shrink: 0;
+
+  @include sp {
+    padding: 1em;
+    text-align: center;
+  }
 
   &--selectable {
     cursor: pointer;

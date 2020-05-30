@@ -67,7 +67,7 @@ export default class Select extends Vue {
 <style lang="scss">
 .k-select {
   position: relative;
-  width: 100%;
+  display: inline-block;
   &__options {
     position: absolute;
     visibility: hidden;
@@ -75,6 +75,11 @@ export default class Select extends Vue {
     opacity: 0;
     transition: 0.2s opacity;
     top: calc(100% + 1px);
+  }
+
+  &__selected {
+    width:100%;
+    cursor: initial;
   }
 
   &--focused {
@@ -87,6 +92,7 @@ export default class Select extends Vue {
 }
 .k-options {
   background-color: white;
+  color: dimgray;
   border: 1px solid gainsboro;
   overflow: hidden;
   border-radius: 3px;
