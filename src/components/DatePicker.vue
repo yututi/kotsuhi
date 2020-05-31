@@ -1,7 +1,7 @@
 <template>
   <div class="k-datepicker" :class="pickerCls" @click.stop>
-    <input type="text" readonly :value="dispVal" @focus="focused = true" @blur="onBlur" />
-    <div class="k-datepicker__calendar k-calendar k-shadow">
+    <input type="text" class="k-datepicker__txt" readonly :value="dispVal" @focus="focused = true" @blur="onBlur" />
+    <div class="k-datepicker__calendar k-calendar">
       <div class="k-calendar__header">{{baseDate.getFullYear()}}年 {{baseDate.getMonth()+1}}月</div>
 
       <div class="k-calendar__row" @click.stop>
@@ -60,6 +60,9 @@ export default class DatePicker extends Vue {
 
   @Prop({ default: () => [] })
   value!: number[];
+
+  @Prop({type:Boolean, default:false})
+  readonly!: boolean;
 
   get selected() {
     return this.value;
@@ -127,7 +130,8 @@ export default class DatePicker extends Vue {
 
   get pickerCls() {
     return {
-      "k-datepicker--focused": this.focused
+      "k-datepicker--focused": this.focused,
+      "k-datepicker--multiple": this.multiple
     };
   }
 
@@ -141,7 +145,7 @@ export default class DatePicker extends Vue {
   }
 
   onCellSelected(cell: Cell) {
-    if (!cell.date) {
+    if (!cell.date || this.readonly) {
       return;
     }
 
@@ -224,12 +228,34 @@ export default class DatePicker extends Vue {
       opacity: 1;
     }
   }
+
+  &--multiple {
+    .k-datepicker {
+      &__txt {
+        display: none;
+      }
+    }
+    .k-calendar {
+      visibility: visible;
+      opacity: 1;
+      position: static;
+
+      box-shadow: none;
+
+      &__btns {
+        display: none;
+      }
+    }
+  }
 }
 .k-calendar {
   border: 1px solid gainsboro;
   border-radius: 3px;
   box-sizing: border-box;
   overflow: hidden;
+
+  box-shadow: 0 3px 4px 0 rgba(0, 0, 0, 0.2), 0 3px 3px -2px rgba(0, 0, 0, 0.14),
+  0 1px 8px 0 rgba(0, 0, 0, 0.12);
 
   &__header {
     padding: 4px;

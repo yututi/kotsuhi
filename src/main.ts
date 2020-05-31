@@ -18,7 +18,8 @@ import {
   faPlusCircle,
   faExchangeAlt,
   faCheckSquare,
-  faSquare
+  faSquare,
+  faEdit
 } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
@@ -33,7 +34,8 @@ library.add(
   faPlusCircle,
   faExchangeAlt,
   faCheckSquare,
-  faSquare
+  faSquare,
+  faEdit
 )
 
 Vue.config.productionTip = false

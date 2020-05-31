@@ -1,16 +1,10 @@
 <template>
-  <app-form>
-    <app-field label="日付">
+  <app-form class="k-multiple-form">
+    <app-field label-top label="日付">
       <app-datepicker multiple v-model="dates" :baseDate="baseDate" />
     </app-field>
     <app-field label="用務先">
-      <input
-        placeholder="変更しない"
-        type="text"
-        autocomplete
-        maxlength="30"
-        v-model="modifiedData.contact"
-      />
+      <input type="text" autocomplete maxlength="30" v-model="modifiedData.contact" />
     </app-field>
     <app-field label="出発">
       <input type="text" autocomplete maxlength="30" v-model="modifiedData.from" />
@@ -21,18 +15,18 @@
     <app-field label="交通手段">
       <app-select :options="options" v-model="modifiedData.transportation"></app-select>
     </app-field>
-    <app-field label="往復">
+    <app-field label="往復" vertical-center>
       <app-check v-model="modifiedData.isRoundTrip"></app-check>
     </app-field>
     <app-field label="費用" unit="円">
       <app-input-num v-model="modifiedData.cost" />
     </app-field>
-    <app-field>
-      <textarea class="k-textarea" placeholder="備考" rows="5" v-model="modifiedData.memo"></textarea>
+    <app-field label-top label="備考">
+      <textarea class="k-textarea" rows="5" v-model="modifiedData.memo"></textarea>
     </app-field>
     <div class="k-form__btns">
       <app-btn-group>
-        <app-btn label="更新" outline @click="onUpdate" />
+        <app-btn label="登録" outline @click="onInsert" />
       </app-btn-group>
     </div>
   </app-form>
@@ -63,14 +57,11 @@ const options = TransportationTypes;
     AppInputNum
   }
 })
-export default class KotsuhiForm extends Vue {
+export default class KotsuhiBulkInsertForm extends Vue {
   @Prop({ required: true })
   baseDate!: Date;
 
-  @Prop({ required: true, default: () => [] })
-  selectedDates!: number[];
-
-  dates: number[]=[];
+  dates: number[] = [];
 
   modifiedData: Input = defaultInput();
 
@@ -86,8 +77,16 @@ export default class KotsuhiForm extends Vue {
     return this.modifiedData.isRoundTrip;
   }
 
-  onUpdate() {
-    this.$emit("update", this.modifiedData);
+  onInsert() {
+    this.$emit("insert", {
+      dates: this.dates,
+      input: this.modifiedData
+    });
   }
 }
 </script>
+<style lang="scss">
+.k-multiple-form {
+  min-width: 400px;
+}
+</style>

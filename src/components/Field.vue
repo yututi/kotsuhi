@@ -1,15 +1,20 @@
 <template>
-  <div class="k-field">
+  <div class="k-field" :class="fieldClasses">
     <div v-if="label" class="k-field__label">{{label}}</div>
     <div class="k-field__body" :class="bodyClasses">
-      <slot />
+      <slot v-if="editable" />
+      <div v-else class="k-field__guard k-guard">
+        <span class="k-guard__label">編集しない</span>
+        <div class="k-guard__icon">
+          <fa-icon icon="edit" @click.stop="onUnshield" />
+        </div>
+      </div>
     </div>
     <div class="k-field__unit" v-if="unit">{{unit}}</div>
   </div>
 </template>
 <script lang="ts">
 import { Component, Vue, Prop } from "vue-property-decorator";
-import Btn from "@/components/Btn.vue";
 
 @Component
 export default class Field extends Vue {
@@ -22,12 +27,36 @@ export default class Field extends Vue {
   @Prop({ type: Boolean, default: false })
   checkBeforeModify!: boolean;
 
+  @Prop({type:Boolean, default:false})
+  shield!: boolean;
+
+  @Prop({type: Boolean, default:false})
+  labelTop!: boolean;
+
+  unShielded: boolean = false;
+
+  get editable():boolean {
+    return !this.shield || this.unShielded
+  }
+
   value: string = "";
+
+  get fieldClasses() {
+    return {
+      "k-field--label-top" : this.labelTop
+    }
+  }
 
   get bodyClasses() {
     return {
-      "k-field__body--has-unit": !!this.unit
+      "k-field__body--has-unit": !!this.unit,
+      "k-field__body--is-shielded": this.shield && !this.unShielded
     };
+  }
+
+  onUnshield() {
+    this.unShielded = true;
+    this.$emit("unshield")
   }
 
   onInput(value: any) {}
@@ -37,6 +66,10 @@ export default class Field extends Vue {
 .k-field {
   display: flex;
   align-items: center;
+
+  &--label-top {
+    align-items: baseline;
+  }
 
   &__label {
     flex-basis: 0;
@@ -80,9 +113,36 @@ export default class Field extends Vue {
     flex-shrink: 0;
     text-align: center;
   }
+
+  &__guard {
+    width: 100%;
+  }
 }
 
-input {
+.k-guard {
+display: flex;
+  padding: 0.3em;
+  border-radius: 3px;
+  border: 1px solid transparent;
+  outline: none;
+  background-color: #eeeeee;
+  color: dimgray;
+
+    &__label {
+      flex:1;
+    }
+
+    &__icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: lightslategray;
+    }
+}
+
+.k-field input,
+.k-field .k-input{
   padding: 0.3em;
   border-radius: 3px;
   border: 1px solid transparent;

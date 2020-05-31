@@ -1,7 +1,6 @@
 <template>
   <div class="k-check" :class="classes" @click.stop="checked = !value">
-    <!-- <div class="k-check__inner"></div> -->
-  </div>
+</div>
 </template>
 <script lang="ts">
 import { Component, Vue, Prop } from "vue-property-decorator";

@@ -48,14 +48,14 @@ export default class Layout extends Mixins(Themeable) {
   display: flex;
   flex-direction: column;
   &__header {
-    padding: 10px;
+    padding: 5px;
     align-items: center;
     display: flex;
     border-bottom: 1px solid gainsboro;
     border: 1px solid transparent;
     box-shadow: 0 3px 4px 0 rgba(0, 0, 0, 0.2),
       0 3px 3px -2px rgba(0, 0, 0, 0.14), 0 1px 8px 0 rgba(0, 0, 0, 0.12);
-    z-index: 1;
+    z-index: 20;
   }
 
   &__title {

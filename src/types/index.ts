@@ -84,3 +84,14 @@ export function createModalConfig(options: ModalConfig) {
         ...options
     }
 }
+
+
+export class UpdateInfo {
+    isContactUpdated: boolean = false;
+    isFromUpdated: boolean = false;
+    isToUpdated: boolean = false;
+    isTransportationUpdated: boolean = false;
+    isCostUpdated: boolean = false;
+    isMemoUpdated: boolean = false;
+    isRoundTripUpdated: boolean = false;
+}

@@ -12,10 +12,10 @@ import AppLayout from "@/components/Layout.vue";
 import AppBtn from "@/components/Btn.vue";
 import AppModal from "@/components/Modal.vue";
 import KForm from "@/components/KotsuhiForm.vue";
-import { Input } from "@/types/index";
-import { firstDayOfMonth, lastDayOfMonth } from "@/utils";
-import { saveAs } from "file-saver";
-import jspdf from "jspdf";
+// import { Input } from "@/types/index";
+// import { firstDayOfMonth, lastDayOfMonth } from "@/utils";
+// import { saveAs } from "file-saver";
+// import jspdf from "jspdf";
 
 
 @Component({

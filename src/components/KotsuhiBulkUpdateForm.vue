@@ -1,34 +1,28 @@
 <template>
-  <app-form>
-    <app-field label="日付">
-      <app-datepicker multiple v-model="dates" :baseDate="baseDate" />
+  <app-form class="k-multiple-form">
+    <app-field label-top label="日付">
+      <app-datepicker multiple readonly v-model="selectedDates" :baseDate="baseDate" />
     </app-field>
-    <app-field label="用務先">
-      <input
-        placeholder="変更しない"
-        type="text"
-        autocomplete
-        maxlength="30"
-        v-model="modifiedData.contact"
-      />
+    <app-field shield label="用務先" @unshield="updateInfo.isContactUpdated = true">
+      <input type="text" autocomplete maxlength="30" v-model="modifiedData.contact" />
     </app-field>
-    <app-field label="出発">
+    <app-field shield label="出発" @unshield="updateInfo.isFromUpdated = true">
       <input type="text" autocomplete maxlength="30" v-model="modifiedData.from" />
     </app-field>
-    <app-field label="到着">
+    <app-field shield label="到着" @unshield="updateInfo.isToUpdated = true">
       <input type="text" autocomplete maxlength="30" v-model="modifiedData.to" />
     </app-field>
-    <app-field label="交通手段">
+    <app-field shield label="交通手段" @unshield="updateInfo.isTransportationUpdated = true">
       <app-select :options="options" v-model="modifiedData.transportation"></app-select>
     </app-field>
-    <app-field label="往復">
+    <app-field shield label="往復" vertical-center @unshield="updateInfo.isRoundTripUpdated = true">
       <app-check v-model="modifiedData.isRoundTrip"></app-check>
     </app-field>
-    <app-field label="費用" unit="円">
+    <app-field shield label="費用" unit="円" @unshield="updateInfo.isCostUpdated = true">
       <app-input-num v-model="modifiedData.cost" />
     </app-field>
-    <app-field>
-      <textarea class="k-textarea" placeholder="備考" rows="5" v-model="modifiedData.memo"></textarea>
+    <app-field shield label-top label="備考" @unshield="updateInfo.isMemoUpdated = true">
+      <textarea class="k-textarea" rows="5" v-model="modifiedData.memo"></textarea>
     </app-field>
     <div class="k-form__btns">
       <app-btn-group>
@@ -47,9 +41,11 @@ import AppField from "@/components/Field.vue";
 import AppSelect from "@/components/Select.vue";
 import AppDatepicker from "@/components/DatePicker.vue";
 import AppInputNum from "@/components/InputNum.vue";
-import { Input, defaultInput, TransportationTypes } from "@/types/index";
+import { Input, defaultInput, TransportationTypes, UpdateInfo } from "@/types/index";
 
 const options = TransportationTypes;
+
+var updatedList: string[] = [];
 
 @Component({
   components: {
@@ -63,16 +59,16 @@ const options = TransportationTypes;
     AppInputNum
   }
 })
-export default class KotsuhiForm extends Vue {
+export default class KotsuhiBulkUpdateForm extends Vue {
   @Prop({ required: true })
   baseDate!: Date;
 
   @Prop({ required: true, default: () => [] })
   selectedDates!: number[];
 
-  dates: number[]=[];
-
   modifiedData: Input = defaultInput();
+
+  updateInfo: UpdateInfo = new UpdateInfo();
 
   get options() {
     return options;
@@ -87,7 +83,16 @@ export default class KotsuhiForm extends Vue {
   }
 
   onUpdate() {
-    this.$emit("update", this.modifiedData);
+    this.$emit("update", {
+      input: this.modifiedData,
+      info: this.updateInfo
+    });
   }
+
 }
 </script>
+<style lang="scss">
+.k-multiple-form {
+  min-width: 400px;
+}
+</style>

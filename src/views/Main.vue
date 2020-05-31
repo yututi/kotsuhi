@@ -1,7 +1,7 @@
 <template>
   <app-layout>
     <template #header-btns>
-      <app-select class="k-theme--primary" style="width:70px;" :options="allMonth"></app-select>
+      <app-select theme="primary" :options="allMonth" v-model="baseDate"></app-select>
       <app-btn label="PDF" />
     </template>
     <template #body>
@@ -16,7 +16,7 @@
           </app-btn-group>
           <app-btn-group>
             <app-btn label="登録" @click="addInput" outline />
-            <app-btn label="一括登録" @click="addInput" outline />
+            <app-btn label="一括登録" @click="showBulkInsertForm" outline />
           </app-btn-group>
         </div>
         <div class="k-main__list k-card-list">
@@ -52,8 +52,19 @@
             </app-btn-group>
           </div>
         </template>
-        <template #bulkForm>
-          <k-bulk-update-form :baseDate="baseDate" :selectedDates="[]" />
+        <template #bulkUpdateForm>
+          <k-bulk-update-form
+            :baseDate="baseDate"
+            :selectedDates="selectedDates"
+            @update="onBulkUpdate"
+          />
+        </template>
+        <template #bulkInsertForm>
+          <k-bulk-insert-form
+            :baseDate="baseDate"
+            :selectedDates="selectedDates"
+            @insert="onBulkInsert"
+          />
         </template>
       </app-modal>
     </template>
@@ -73,7 +84,8 @@ import {
   InputEntity,
   defaultInput,
   ModalConfig,
-  createModalConfig
+  createModalConfig,
+  UpdateInfo
 } from "@/types/index";
 import db from "@/store";
 import { firstDayOfMonth, lastDayOfMonth } from "@/utils";
@@ -99,7 +111,9 @@ function toEntity(input: Input, baseDate: Date): InputEntity {
     AppSelect,
     KCard,
     "k-form": () => import("@/components/KotsuhiForm.vue"),
-    "k-bulk-update-form": () => import("@/components/KotsuhiBulkUpdateForm.vue")
+    "k-bulk-update-form": () =>
+      import("@/components/KotsuhiBulkUpdateForm.vue"),
+    "k-bulk-insert-form": () => import("@/components/KotsuhiBulkInsertForm.vue")
   }
 })
 export default class Main extends Vue {
@@ -107,11 +121,7 @@ export default class Main extends Vue {
   inputList: Input[] = [];
   selected: Input = defaultInput();
   modal: boolean = false;
-  allMonth = [
-    {
-      label: "2020/9",
-      value: 2
-    }
+  allMonth : {label:string, value:Date}[] = [
   ];
   get month() {
     return this.baseDate.getMonth() + 1;
@@ -152,9 +162,35 @@ export default class Main extends Vue {
     var check = !this.allChecked;
     this.inputList.forEach(input => (input.isChecked = check));
   }
-
-  mounted() {
+  get selectedDates() {
+    return this.inputList
+      .filter(input => input.isChecked)
+      .map(input => input.date);
+  }
+  async mounted() {
     this.updateList();
+    const first = await db.inputs.orderBy("ymd").first()
+    const currentYmd = firstDayOfMonth(new Date());
+    let firstYmd;
+    if (first) {
+      firstYmd = firstDayOfMonth(first.ymd);
+    } else {
+      firstYmd = currentYmd;
+      }
+    let preYmd = firstYmd;
+    const ymdList = []
+    while(preYmd <= currentYmd){
+      ymdList.push(preYmd)
+      preYmd = new Date(preYmd.getFullYear(), preYmd.getMonth() + 2, 1);
+    }
+    this.baseDate = currentYmd;
+    this.allMonth = ymdList.map(ymd => {
+      return {
+        label: `${ymd.getFullYear()}/${ymd.getMonth() + 1}`,
+        value: ymd
+      }
+    })
+    console.log(this.allMonth)
   }
   async onCreateOrUpdate(newData: Input) {
     if (newData.id === undefined) {
@@ -194,7 +230,14 @@ export default class Main extends Vue {
   showBulkUpdateForm() {
     this.openDialog({
       title: "交通費入力",
-      slot: "bulkForm",
+      slot: "bulkUpdateForm",
+      expandOnSp: true
+    });
+  }
+  showBulkInsertForm() {
+    this.openDialog({
+      title: "交通費入力",
+      slot: "bulkInsertForm",
       expandOnSp: true
     });
   }
@@ -203,6 +246,36 @@ export default class Main extends Vue {
       slot: "deleteComfirm",
       header: false
     });
+  }
+  async onBulkUpdate(update: { input: Input; info: UpdateInfo }) {
+    const updateEntities = this.inputList
+      .filter(input => input.isChecked)
+      .map(input => {
+        if (update.info.isContactUpdated) input.contact = update.input.contact;
+        if (update.info.isFromUpdated) input.from = update.input.from;
+        if (update.info.isToUpdated) input.to = update.input.to;
+        if (update.info.isTransportationUpdated)
+          input.transportation = update.input.transportation;
+        if (update.info.isCostUpdated) input.cost = update.input.cost;
+        if (update.info.isMemoUpdated) input.memo = update.input.memo;
+        if (update.info.isRoundTripUpdated)
+          input.isRoundTrip = update.input.isRoundTrip;
+        return toEntity(input, this.baseDate);
+      });
+    await db.inputs.bulkPut(updateEntities);
+    this.updateList();
+    this.modal = false;
+  }
+  async onBulkInsert(insertData: { input: Input; dates: number[] }) {
+
+    const newEntities = insertData.dates.map(date => {
+      insertData.input.date = date;
+      return toEntity(insertData.input, this.baseDate)
+    })
+
+    await db.inputs.bulkAdd(newEntities);
+    this.updateList();
+    this.modal = false;
   }
 }
 </script>
@@ -219,6 +292,7 @@ export default class Main extends Vue {
     padding: 5px 0px;
     background-color: white;
     display: flex;
+    z-index: 10;
 
     & > *:not(:first-child) {
       margin-left: 5px;
@@ -282,7 +356,6 @@ export default class Main extends Vue {
 .list-item-enter,
 .list-item-leave-to {
   opacity: 0;
-  transform: translateX(50px);
 }
 .list-item-leave-active {
   position: absolute;

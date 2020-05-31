@@ -19,4 +19,10 @@ $themes : (
         border-color: map-get($theme, "bgColor");
         color: map-get($theme, "color");
     }
+
+    .k-theme-inv--#{$name} {
+        background-color: transparent;
+        border-color: transparent;
+        color: map-get($theme, "bgColor");
+    }
 }
