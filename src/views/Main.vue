@@ -1,7 +1,7 @@
 <template>
   <app-layout>
     <template #header-btns>
-      <app-select theme="primary" :options="allMonth" v-model="baseDate"></app-select>
+      <app-ym-select theme="primary" :options="allMonth" :value="baseDate" @input="updateYm"></app-ym-select>
       <app-btn label="PDF" />
     </template>
     <template #body>
@@ -62,7 +62,6 @@
         <template #bulkInsertForm>
           <k-bulk-insert-form
             :baseDate="baseDate"
-            :selectedDates="selectedDates"
             @insert="onBulkInsert"
           />
         </template>
@@ -79,6 +78,7 @@ import AppBtnGroup from "@/components/BtnGroup.vue";
 import AppModal from "@/components/Modal.vue";
 import KCard from "@/components/KotsuhiCard.vue";
 import AppSelect from "@/components/Select.vue";
+import AppYmSelect from "@/components/YearMonthSelect.vue";
 import {
   Input,
   InputEntity,
@@ -110,6 +110,7 @@ function toEntity(input: Input, baseDate: Date): InputEntity {
     AppModal,
     AppSelect,
     KCard,
+    AppYmSelect,
     "k-form": () => import("@/components/KotsuhiForm.vue"),
     "k-bulk-update-form": () =>
       import("@/components/KotsuhiBulkUpdateForm.vue"),
@@ -121,8 +122,7 @@ export default class Main extends Vue {
   inputList: Input[] = [];
   selected: Input = defaultInput();
   modal: boolean = false;
-  allMonth : {label:string, value:Date}[] = [
-  ];
+  allMonth: { label: string; value: Date }[] = [];
   get month() {
     return this.baseDate.getMonth() + 1;
   }
@@ -168,29 +168,28 @@ export default class Main extends Vue {
       .map(input => input.date);
   }
   async mounted() {
-    this.updateList();
-    const first = await db.inputs.orderBy("ymd").first()
+    const first = await db.inputs.orderBy("ymd").first();
     const currentYmd = firstDayOfMonth(new Date());
     let firstYmd;
     if (first) {
       firstYmd = firstDayOfMonth(first.ymd);
     } else {
       firstYmd = currentYmd;
-      }
+    }
     let preYmd = firstYmd;
-    const ymdList = []
-    while(preYmd <= currentYmd){
-      ymdList.push(preYmd)
-      preYmd = new Date(preYmd.getFullYear(), preYmd.getMonth() + 2, 1);
+    const ymdList = [];
+    while (preYmd <= currentYmd) {
+      ymdList.push(preYmd);
+      preYmd = new Date(preYmd.getFullYear(), preYmd.getMonth() + 1, 1);
     }
     this.baseDate = currentYmd;
     this.allMonth = ymdList.map(ymd => {
       return {
         label: `${ymd.getFullYear()}/${ymd.getMonth() + 1}`,
         value: ymd
-      }
-    })
-    console.log(this.allMonth)
+      };
+    });
+    this.updateList();
   }
   async onCreateOrUpdate(newData: Input) {
     if (newData.id === undefined) {
@@ -267,15 +266,18 @@ export default class Main extends Vue {
     this.modal = false;
   }
   async onBulkInsert(insertData: { input: Input; dates: number[] }) {
-
     const newEntities = insertData.dates.map(date => {
       insertData.input.date = date;
-      return toEntity(insertData.input, this.baseDate)
-    })
+      return toEntity(insertData.input, this.baseDate);
+    });
 
     await db.inputs.bulkAdd(newEntities);
     this.updateList();
     this.modal = false;
+  }
+  async updateYm(ym: Date){
+    this.baseDate = ym;
+    this.updateList();
   }
 }
 </script>

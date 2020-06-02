@@ -158,4 +158,7 @@ display: flex;
     }
   }
 }
+.k-field .k-select {
+  width: 100%;
+}
 </style>

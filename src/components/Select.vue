@@ -7,9 +7,7 @@
       tabindex="0"
       @blur="focused = false"
       @focus="focused = true"
-    >
-    {{label}}
-    </div>
+    >{{label}}</div>
     <div class="k-select__options k-options k-shadow">
       <div
         class="k-options__item"
@@ -44,7 +42,12 @@ export default class Select extends Vue {
     if (!this.value || !this.options.length) {
       return "";
     }
-    return this.options.find(option => option.value == this.value)!.label;
+    const option = this.options.find(option => option.value == this.value);
+    if (!option) {
+      console.warn("No option found.", this.options, this.value)
+      return ""
+    }
+    return option.label;
   }
 
   focused = false;

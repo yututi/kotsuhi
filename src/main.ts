@@ -8,34 +8,28 @@ import '@/styles/theme.scss'
 
 import { library } from '@fortawesome/fontawesome-svg-core'
 import {
-  faCog,
   faTimesCircle,
-  faTrashAlt,
   faFileUpload,
   faLongArrowAltRight,
   faLongArrowAltLeft,
-  faArrowsAltH,
   faPlusCircle,
   faExchangeAlt,
-  faCheckSquare,
-  faSquare,
-  faEdit
+  faEdit,
+  faCaretLeft,
+  faCaretRight
 } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
 library.add(
-  faCog,
   faTimesCircle,
-  faTrashAlt,
   faFileUpload,
   faLongArrowAltRight,
   faLongArrowAltLeft,
-  faArrowsAltH,
   faPlusCircle,
   faExchangeAlt,
-  faCheckSquare,
-  faSquare,
-  faEdit
+  faEdit,
+  faCaretLeft,
+  faCaretRight
 )
 
 Vue.config.productionTip = false
