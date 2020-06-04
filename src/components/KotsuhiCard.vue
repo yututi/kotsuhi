@@ -105,9 +105,14 @@ export default class KotsuhiCard extends Vue {
 
   &__head-block {
     width: 160px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
     @include sp {
       text-align: initial;
-      width: 100px;
+      width: 100%;
+      padding: 0px 10px 10px 10px;
     }
   }
 
@@ -122,12 +127,9 @@ export default class KotsuhiCard extends Vue {
     }
     width: 400px;
     @include sp {
-      padding-left: 10px;
-      flex: 1;
+      padding: 10px 10px 0px 10px;
+      max-width: 100%;
     }
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
   }
 
   &__transportation {
@@ -135,8 +137,8 @@ export default class KotsuhiCard extends Vue {
   }
 
   &__cost {
-    flex: 1;
     text-align: right;
+    white-space: nowrap;
   }
 
   &__memo {
@@ -152,28 +154,37 @@ export default class KotsuhiCard extends Vue {
     }
   }
 
-  &__btns {
-    @include sp {
-      display: none;
-    }
-  }
-
   &__divider {
     margin: 0px 10px;
-    height: 30px;
+    height: 25px;
     border-left: 1px solid gainsboro;
+    @include sp {
+      height: 0px;
+      width: 90%;
+      border-top: 1px solid gainsboro;
+      border-left: none;
+    }
   }
 
   &__from,
   &__to {
     min-width: 2em;
     text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    @include sp {
+      min-width: 0px;
+      flex: 1;
+    }
   }
 }
 
 .k-card-block {
-  display:flex;
+  display: flex;
   flex-direction: column;
+  flex: 1;
+  overflow: hidden;
 
   &__head {
     font-size: 14px;
@@ -186,6 +197,7 @@ export default class KotsuhiCard extends Vue {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+
     & > *:not(:first-child) {
       margin-left: 5px;
     }

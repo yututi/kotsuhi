@@ -2,7 +2,7 @@
   <app-layout>
     <template #header-btns>
       <app-ym-select theme="primary" :options="allMonth" :value="baseDate" @input="updateYm"></app-ym-select>
-      <app-btn label="PDF" />
+      <app-btn label="PDF" @click="downloadPdf" />
     </template>
     <template #body>
       <div class="k-main">
@@ -14,7 +14,7 @@
             <app-btn label="一括編集" outline @click="showBulkUpdateForm" />
             <app-btn label="一括削除" theme="error" @click="showDeleteConfirm" outline />
           </app-btn-group>
-          <app-btn-group>
+          <app-btn-group class="k-bulk-update-btns">
             <app-btn label="登録" @click="addInput" outline />
             <app-btn label="一括登録" @click="showBulkInsertForm" outline />
           </app-btn-group>
@@ -60,10 +60,7 @@
           />
         </template>
         <template #bulkInsertForm>
-          <k-bulk-insert-form
-            :baseDate="baseDate"
-            @insert="onBulkInsert"
-          />
+          <k-bulk-insert-form :baseDate="baseDate" @insert="onBulkInsert" />
         </template>
       </app-modal>
     </template>
@@ -275,9 +272,14 @@ export default class Main extends Vue {
     this.updateList();
     this.modal = false;
   }
-  async updateYm(ym: Date){
+  async updateYm(ym: Date) {
     this.baseDate = ym;
     this.updateList();
+  }
+
+  downloadPdf() {
+    const date = this.baseDate;
+    this.$router.push(`/pdf/${date.getFullYear()}/${date.getMonth() + 1}`);
   }
 }
 </script>
@@ -331,6 +333,10 @@ export default class Main extends Vue {
   padding: 10px 20px;
   pointer-events: none;
 
+  @include pc {
+    display: none;
+  }
+
   &__icon {
     color: #2196f3;
     font-size: 30px;
@@ -362,8 +368,11 @@ export default class Main extends Vue {
 .list-item-leave-active {
   position: absolute;
 }
-.k-bulk-update-btns {
-  @include sp {
+@include sp {
+  .k-bulk-update-btns {
+    display: none;
+  }
+  .k-bulk-insert-btn {
     display: none;
   }
 }

@@ -1,3 +1,4 @@
+// 何用に作ったか忘れた
 const path = require('path')
 
 const rootPath = path.resolve(__dirname, '../')

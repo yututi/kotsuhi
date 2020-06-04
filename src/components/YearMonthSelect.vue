@@ -20,7 +20,12 @@
       <table>
         <tr v-for="(monthRow, index) in months" :key="index">
           <td v-for="month in monthRow" :key="`${index}_${month}`">
-            <app-btn class="k-ym-btn" :label="String(month)" :outline="!isSelectedYm(month)" @click="onMonthSelected(month)" />
+            <app-btn
+              class="k-ym-btn"
+              :label="String(month)"
+              :outline="!isSelectedYm(month)"
+              @click="onMonthSelected(month)"
+            />
           </td>
         </tr>
       </table>
@@ -53,6 +58,8 @@ export default class Select extends Vue {
   selectedYear = 2020;
   currentYear = this.selectedYear;
   selectedMonth = 0;
+
+  listener: EventListener | null = null;
 
   months = [
     [1, 2, 3],
@@ -104,15 +111,21 @@ export default class Select extends Vue {
   }
 
   isSelectedYm(month: number) {
-      return this.currentYear === this.selectedYear && this.selectedMonth === month;
+    return (
+      this.currentYear === this.selectedYear && this.selectedMonth === month
+    );
   }
 
   mounted() {
     this.selectedYear = this.value.getFullYear();
     this.selectedMonth = this.value.getMonth() + 1;
-    window.addEventListener("click", () => {
+    this.listener = () => {
       this.focused = false;
-    });
+    };
+    window.addEventListener("click", this.listener);
+  }
+  beforeDestroy() {
+    if (this.listener) window.removeEventListener("click", this.listener);
   }
 }
 </script>
@@ -156,9 +169,9 @@ export default class Select extends Vue {
 
   &__header {
     width: 100%;
-    padding: .5em;
+    padding: 0.5em;
     display: flex;
-    justify-content:space-around;
+    justify-content: space-around;
     align-items: center;
     user-select: none;
   }
@@ -171,17 +184,17 @@ export default class Select extends Vue {
 }
 
 .k-month-arrow {
-    display: flex;
-    justify-content:center;
-    align-items: center;
-    height: 30px;
-    width: 30px;
-    border-radius: 4px;
-    font-size: 28px;
-    color: #2196f3;
-    &:hover {
-        cursor: pointer;
-        background-color: gainsboro;
-    }
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 30px;
+  width: 30px;
+  border-radius: 4px;
+  font-size: 28px;
+  color: #2196f3;
+  &:hover {
+    cursor: pointer;
+    background-color: gainsboro;
+  }
 }
 </style>

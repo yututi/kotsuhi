@@ -42,7 +42,7 @@ export const TransportationTypes = [
     },
     {
         value: "2",
-        label: "飛行機"
+        label: "航空機"
     },
     {
         value: "3",

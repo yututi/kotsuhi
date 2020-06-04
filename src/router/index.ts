@@ -11,7 +11,7 @@ const routes = [
         component: Main
     },
     {
-        path: '/pdf',
+        path: '/pdf/:year/:month',
         name: 'PDF',
         component: () => import("@/views/PDF.vue")
     }
