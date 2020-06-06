@@ -69,7 +69,8 @@ export interface ModalConfig {
     slot?: string
     title?: string
     expandOnSp?: boolean
-    header?: boolean
+    header?: boolean,
+    other?:any
 }
 
 const DefaultModalConfig: ModalConfig = {

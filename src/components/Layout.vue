@@ -1,9 +1,20 @@
 <template>
   <div class="k-layout">
     <header class="k-layout__header" :class="headerClasses">
+      <app-btn class="k-hide-on-pc" icon="bars" round @click="showMenu = true"></app-btn>
       <span class="k-layout__title">交通費精算</span>
-      <div class="k-layout__btns">
-        <slot name="header-btns" />
+      <div class="k-layout__left-items">
+        <slot name="header-left-items" />
+      </div>
+      <div class="k-layout__sub-items-wrapper" :class="wrapperClasses" @click="showMenu = false"></div>
+      <div class="k-layout__sub-items k-sub-items" :class="subMenuClasses">
+        <app-btn class="k-hide-on-pc" icon="times-circle" round @click="showMenu = false"></app-btn>
+        <slot name="header-sub-items" />
+      </div>
+
+      <div class="k-spacer"></div>
+      <div class="k-layout__right-items">
+        <slot name="header-right-items" />
       </div>
     </header>
     <div class="k-layout__body">
@@ -13,19 +24,19 @@
 </template>
 <script lang="ts">
 import { Component, Mixins, Prop } from "vue-property-decorator";
-import Btn from "@/components/Btn.vue";
+import AppBtn from "@/components/Btn.vue";
 import Themeable from "@/components/mixins/themeable";
 
 @Component({
   components: {
-    Btn
+    AppBtn
   }
 })
 export default class Layout extends Mixins(Themeable) {
   @Prop({ type: String, required: false, default: "" })
   label!: string;
 
-  hasMenu!: boolean;
+  showMenu = false;
 
   get headerClasses() {
     return {
@@ -33,16 +44,29 @@ export default class Layout extends Mixins(Themeable) {
     };
   }
 
+  get subMenuClasses() {
+    return {
+      "k-sub-items--show": this.showMenu,
+      ...this.themeClasses
+    };
+  }
+
+  get wrapperClasses() {
+    return {
+      "k-layout__sub-items-wrapper--show": this.showMenu
+    };
+  }
+
   onclick(e: any) {
     this.$emit("click", e);
   }
 
-  mounted() {
-    this.hasMenu = !!this.$slots.menu;
-  }
+  mounted() {}
 }
 </script>
 <style lang="scss">
+@import "../styles/base.scss";
+
 .k-layout {
   height: 100vh;
   display: flex;
@@ -59,8 +83,8 @@ export default class Layout extends Mixins(Themeable) {
   }
 
   &__title {
-    flex: 1;
     font-size: 26px;
+    padding: 0px 5px;
   }
 
   &__body {
@@ -73,5 +97,61 @@ export default class Layout extends Mixins(Themeable) {
     position: sticky;
     top: 0px;
   }
+
+  @include sp {
+    &__header {
+      position: relative;
+    }
+    &__sub-items {
+      position: absolute;
+    }
+  }
+}
+@include sp {
+  .k-layout__sub-items-wrapper {
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.3s;
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    height: 100vh;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.2);
+
+    &--show {
+      visibility: visible;
+      opacity: 1;
+    }
+  }
+}
+.k-sub-items {
+  @include sp {
+    top: 0px;
+    left: -100%;
+    height: calc(100vh);
+    max-width: 300px;
+    min-width: 200px;
+    width: 70%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    background-color: white;
+    padding: 10px;
+    border-right: 1px solid gainsboro;
+    box-shadow: 0 3px 4px 0 rgba(0, 0, 0, 0.2),
+      0 3px 3px -2px rgba(0, 0, 0, 0.14), 0 1px 8px 0 rgba(0, 0, 0, 0.12);
+    transition: left 0.3s;
+    & > *:not(:first-child) {
+      margin-top: 10px;
+    }
+
+    &--show {
+      left: 0px;
+    }
+  }
+}
+.k-spacer {
+  flex: 1;
 }
 </style>

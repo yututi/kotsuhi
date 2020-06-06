@@ -1,100 +1,23 @@
 <template>
   <transition name="fade">
-    <div :class="modalCls" v-if="show" class="k-modal" @click="onclick($event)">
-      <div class="k-modal__dialog k-dialog k-shadow" :class="dialogClasses" @click.stop>
-        <div v-if="_header" class="k-dialog__header" :class="headerClasses">
-          <span class="k-dialog__header-title">{{_title}}</span>
-          <fa-icon class="k-icon" icon="times-circle" @click="onclick($event)" />
-        </div>
-        <div class="k-dialog__body">
-          <slot :name="_slotName" />
-        </div>
-      </div>
+    <div v-if="show" class="k-modal" @click="onclick($event)">
+      <slot />
     </div>
   </transition>
 </template>
 <script lang="ts">
-import { Component, Mixins, Prop } from "vue-property-decorator";
-import Themeable from "@/components/mixins/themeable";
-import { ModalConfig } from "@/types";
-const DefaultModalConfig: ModalConfig = {
-  show: true,
-  slot: "default",
-  header: true
-};
+import { Component, Vue, Prop } from "vue-property-decorator";
 @Component
-export default class Modal extends Mixins(Themeable) {
+export default class Modal extends Vue {
   @Prop({ type: Boolean, default: false })
   value!: boolean;
-
-  openedByFunc: boolean = false;
-
-  option: ModalConfig = { };
-
-  @Prop({ type: String, default: "default" })
-  slotName!: string;
-
-  @Prop({ type: String, default: "" })
-  title!: string;
-
-  @Prop({ type: Boolean, default: true })
-  expandOnSp!: boolean;
-
-  @Prop({ type: Boolean, default: true })
-  header!: boolean;
-
-  get _slotName() {
-    return this.openedByFunc ? this.option.slot : this.slotName;
-  }
-
-  get _expandOnSp() {
-    return this.openedByFunc ? this.option.expandOnSp : this.expandOnSp;
-  }
-
-  get _title() {
-    return this.openedByFunc ? this.option.title : this.title;
-  }
-
-  get _header() {
-    return this.openedByFunc ? this.option.header : this.header;
-  }
 
   get show() {
     return this.value;
   }
 
   set show(value) {
-    if (!value) {
-      this.openedByFunc = false;
-    }
     this.$emit("input", value);
-  }
-
-  get modalCls() {
-    return {
-      "k-modal--show": !!this.value
-    };
-  }
-
-  get dialogClasses() {
-    return {
-      "k-dialog--expand-on-sp": this._expandOnSp
-    };
-  }
-
-  get headerClasses() {
-    return {
-      ...this.themeClasses
-    };
-  }
-
-  openDialog(options: ModalConfig) {
-    this.openedByFunc = true;
-    this.option = {
-      ...DefaultModalConfig,
-      ...options
-    };
-    this.show = true;
   }
 
   onclick(e: any) {
@@ -124,40 +47,5 @@ export default class Modal extends Mixins(Themeable) {
 .fade-enter,
 .fade-leave-to {
   opacity: 0;
-}
-
-.k-dialog {
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  background-color: white;
-  border-radius: 5px;
-  overflow: hidden;
-
-  &__header {
-    display: flex;
-    align-items: center;
-    padding: 10px;
-    color: white;
-  }
-  &__header-title {
-    flex: 1;
-  }
-
-  &__body {
-    flex: 1;
-    padding: 10px;
-  }
-
-  &--expand-on-sp {
-    @include sp {
-      width: calc(100% - 10px);
-    }
-  }
-}
-.k-icon {
-  &:hover {
-    cursor: pointer;
-  }
 }
 </style>

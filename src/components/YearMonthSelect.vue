@@ -1,55 +1,55 @@
 <template>
-  <div class="k-ym-select" :class="selectCls" @click.stop>
-    <app-btn
-      class="k-ym-select__selected k-input"
-      :class="inputCls"
-      focusable
-      @focus.native="focused = true"
-      :label="label"
-    />
-    <div class="k-ym-select__options k-ym-options k-shadow">
-      <div class="k-ym-options__header">
-        <a class="k-month-arrow" @click="currentYear--">
-          <fa-icon icon="caret-left" />
-        </a>
-        <span>{{currentYear}}</span>
-        <a class="k-month-arrow" @click="currentYear++">
-          <fa-icon icon="caret-right" />
-        </a>
+  <app-popover class="k-ym-select">
+    <template #default="{showPopover}">
+      <app-btn
+        class="k-ym-select__selected k-input"
+        :class="inputCls"
+        focusable
+        @click="showPopover"
+        :label="label"
+      />
+    </template>
+    <template #popover>
+      <div class="k-ym-options k-shadow">
+        <div class="k-ym-options__header" @click.stop>
+          <a class="k-month-arrow" @click="currentYear--">
+            <fa-icon icon="caret-left" />
+          </a>
+          <span>{{currentYear}}</span>
+          <a class="k-month-arrow" @click="currentYear++">
+            <fa-icon icon="caret-right" />
+          </a>
+        </div>
+        <table>
+          <tr v-for="(monthRow, index) in months" :key="index">
+            <td v-for="month in monthRow" :key="`${index}_${month}`">
+              <app-btn
+                class="k-ym-btn"
+                :label="String(month)"
+                :outline="!isSelectedYm(month)"
+                @click="onMonthSelected(month)"
+              />
+            </td>
+          </tr>
+        </table>
       </div>
-      <table>
-        <tr v-for="(monthRow, index) in months" :key="index">
-          <td v-for="month in monthRow" :key="`${index}_${month}`">
-            <app-btn
-              class="k-ym-btn"
-              :label="String(month)"
-              :outline="!isSelectedYm(month)"
-              @click="onMonthSelected(month)"
-            />
-          </td>
-        </tr>
-      </table>
-    </div>
-  </div>
+    </template>
+  </app-popover>
 </template>
 <script lang="ts">
 import { Component, Vue, Prop } from "vue-property-decorator";
 import AppBtn from "@/components/Btn.vue";
-
-interface Option {
-  label: string;
-  value: Date;
-}
+import AppPopover from "@/components/Popover.vue";
 
 @Component({
   components: {
-    AppBtn
+    AppBtn,
+    AppPopover
   }
 })
 export default class Select extends Vue {
-  options: Option[] = [];
 
-  @Prop({ required: false, default: "" })
+  @Prop({ required: true })
   value!: Date;
 
   @Prop({ required: false })
@@ -69,15 +69,10 @@ export default class Select extends Vue {
   ];
 
   get label() {
-    return `${this.selectedYear} / ${this.selectedMonth}`;
+    return `${this.selectedYear}年 ${this.selectedMonth}月度`;
   }
 
   focused = false;
-
-  selected(option: Option) {
-    this.focused = false;
-    this.$emit("input", option.value);
-  }
 
   delayedOutFocus() {
     this.$nextTick(() => {
@@ -165,7 +160,7 @@ export default class Select extends Vue {
   border: 1px solid gainsboro;
   border-radius: 3px;
   overflow: hidden;
-  transform: translateX(-50%);
+  padding: 5px;
 
   &__header {
     width: 100%;

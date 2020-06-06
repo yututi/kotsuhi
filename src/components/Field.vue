@@ -27,24 +27,28 @@ export default class Field extends Vue {
   @Prop({ type: Boolean, default: false })
   checkBeforeModify!: boolean;
 
-  @Prop({type:Boolean, default:false})
+  @Prop({ type: Boolean, default: false })
   shield!: boolean;
 
-  @Prop({type: Boolean, default:false})
+  @Prop({ type: Boolean, default: false })
   labelTop!: boolean;
+
+  @Prop({ type: Boolean, default: false })
+  dense!: boolean;
 
   unShielded: boolean = false;
 
-  get editable():boolean {
-    return !this.shield || this.unShielded
+  get editable(): boolean {
+    return !this.shield || this.unShielded;
   }
 
   value: string = "";
 
   get fieldClasses() {
     return {
-      "k-field--label-top" : this.labelTop
-    }
+      "k-field--label-top": this.labelTop,
+      "k-field--dense": this.dense
+    };
   }
 
   get bodyClasses() {
@@ -56,7 +60,7 @@ export default class Field extends Vue {
 
   onUnshield() {
     this.unShielded = true;
-    this.$emit("unshield")
+    this.$emit("unshield");
   }
 
   onInput(value: any) {}
@@ -120,7 +124,7 @@ export default class Field extends Vue {
 }
 
 .k-guard {
-display: flex;
+  display: flex;
   padding: 0.3em;
   border-radius: 3px;
   border: 1px solid transparent;
@@ -128,33 +132,42 @@ display: flex;
   background-color: #eeeeee;
   color: dimgray;
 
-    &__label {
-      flex:1;
-    }
+  &__label {
+    flex: 1;
+  }
 
-    &__icon {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      color: lightslategray;
-    }
+  &__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: lightslategray;
+  }
 }
 
-.k-field input,
-.k-field .k-input{
-  padding: 0.3em;
-  border-radius: 3px;
-  border: 1px solid transparent;
-  outline: none;
-  background-color: #eeeeee;
-  width: 100%;
+.k-field {
+  input,
+  .k-input {
+    padding: 0.3em;
+    border-radius: 3px;
+    border: 1px solid transparent;
+    outline: none;
+    background-color: #f3f3f3;
+    width: 100%;
 
-  &:focus {
-    background-color: #ffffff;
+    &:focus {
+      background-color: #ffffff;
 
-    &:after {
-      width: 100%;
+      &:after {
+        width: 100%;
+      }
+    }
+  }
+
+  &--dense {
+    input,
+    .k-input {
+      padding: 0px 2px;
     }
   }
 }

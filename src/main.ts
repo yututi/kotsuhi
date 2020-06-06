@@ -9,28 +9,42 @@ import '@/styles/theme.scss'
 import { library } from '@fortawesome/fontawesome-svg-core'
 import {
   faTimesCircle,
-  faFileUpload,
+  // faFileUpload,
   faLongArrowAltRight,
-  faLongArrowAltLeft,
+  // faLongArrowAltLeft,
   faPlusCircle,
   faExchangeAlt,
   faEdit,
   faCaretLeft,
-  faCaretRight
+  faCaretRight,
+  faSignInAlt,
+  // faUpload,
+  faSignOutAlt,
+  // faDownload,
+  faBars,
+  faFilePdf
 } from '@fortawesome/free-solid-svg-icons'
+import { faGoogle } from '@fortawesome/free-brands-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
 library.add(
   faTimesCircle,
-  faFileUpload,
+  // faFileUpload,
   faLongArrowAltRight,
-  faLongArrowAltLeft,
+  // faLongArrowAltLeft,
   faPlusCircle,
   faExchangeAlt,
   faEdit,
   faCaretLeft,
-  faCaretRight
+  faCaretRight,
+  faSignInAlt,
+  // faUpload,
+  faSignOutAlt,
+  // faDownload,
+  faBars,
+  faFilePdf
 )
+library.add(faGoogle)
 
 Vue.config.productionTip = false
 Vue.component("fa-icon", FontAwesomeIcon)

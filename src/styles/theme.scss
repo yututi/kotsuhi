@@ -11,6 +11,10 @@ $themes : (
         "bgColor" : #f44336,
         "color": white,
     ),
+    "warn": (
+        "bgColor" : #f4c136,
+        "color": white,
+    ),
 );
 
 @each $name, $theme in $themes {

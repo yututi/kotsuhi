@@ -128,7 +128,7 @@ export default class KotsuhiCard extends Vue {
     width: 400px;
     @include sp {
       padding: 10px 10px 0px 10px;
-      max-width: 100%;
+      width: 100%;
     }
   }
 

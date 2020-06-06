@@ -13,7 +13,7 @@
           {{year}}年 {{month}}月度 
         </div>
         <div style="text-align:right;">
-          {{name}}
+          {{userName}}
         </div>
       </div>
       <div class="sheet__body">
@@ -72,6 +72,7 @@
 import db from "@/store";
 import { firstDayOfMonth, lastDayOfMonth } from "@/utils";
 import { TransportationTypes } from "@/types"
+import globalState from "@/globalStateModule"
 
 const tranMap = TransportationTypes.reduce((map, type) => {
   map[type.value] = type.label;
@@ -88,13 +89,15 @@ export default {
       month:0,
       allInputList: [],
       inputPerSectionList: [],
-      transportations: tranMap,
-      name: "hoge太郎"
+      transportations: tranMap
     }
   },
   computed: {
     sum: function() {
       return this.allInputList.reduce((sum, input) => {return sum + input.cost}, 0).toLocaleString()
+    },
+    userName: function (){
+      return globalState.userName;
     }
   },
   methods: {

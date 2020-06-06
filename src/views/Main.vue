@@ -1,8 +1,13 @@
 <template>
   <app-layout>
-    <template #header-btns>
+    <template #header-left-items>
       <app-ym-select theme="primary" :options="allMonth" :value="baseDate" @input="updateYm"></app-ym-select>
-      <app-btn label="PDF" @click="downloadPdf" />
+    </template>
+    <template #header-sub-items>
+      <app-user-select></app-user-select>
+    </template>
+    <template #header-right-items>
+      <app-btn icon="file-pdf" round label="PDF" @click="downloadPdf" />
     </template>
     <template #body>
       <div class="k-main">
@@ -44,11 +49,11 @@
             :baseDate="baseDate"
           />
         </template>
-        <template #deleteComfirm>
+        <template #commonComfirm="{on:{ok}, other}">
           <div class="k-confirm">
-            <div class="k-confirm__txt">チェックしたデータを削除します。</div>
+            <div class="k-confirm__txt">{{other}}</div>
             <app-btn-group class="k-confirm__btns">
-              <app-btn label="OK" @click="onDeleteOk" />
+              <app-btn label="OK" @click="ok" />
             </app-btn-group>
           </div>
         </template>
@@ -72,9 +77,9 @@ import AppLayout from "@/components/Layout.vue";
 import AppBtn from "@/components/Btn.vue";
 import AppCheck from "@/components/Check.vue";
 import AppBtnGroup from "@/components/BtnGroup.vue";
-import AppModal from "@/components/Modal.vue";
+import AppModal from "@/components/ModalDialog.vue";
 import KCard from "@/components/KotsuhiCard.vue";
-import AppSelect from "@/components/Select.vue";
+import AppUserSelect from "@/components/UserInfo.vue";
 import AppYmSelect from "@/components/YearMonthSelect.vue";
 import {
   Input,
@@ -86,6 +91,7 @@ import {
 } from "@/types/index";
 import db from "@/store";
 import { firstDayOfMonth, lastDayOfMonth } from "@/utils";
+import auth from "@/authModule";
 
 function fromEntity(entity: InputEntity): Input {
   const date = entity.ymd.getDate();
@@ -105,7 +111,7 @@ function toEntity(input: Input, baseDate: Date): InputEntity {
     AppBtnGroup,
     AppCheck,
     AppModal,
-    AppSelect,
+    AppUserSelect,
     KCard,
     AppYmSelect,
     "k-form": () => import("@/components/KotsuhiForm.vue"),
@@ -129,6 +135,15 @@ export default class Main extends Vue {
       this.inputList.every(input => input.isChecked)
     );
   }
+  get selectedDates() {
+    return this.inputList
+      .filter(input => input.isChecked)
+      .map(input => input.date);
+  }
+  get isLoggedIn() {
+    return auth.isLoggedIn;
+  }
+
   onModBtnClicked(input: Input) {
     this.selected = input;
     this.openDialog({
@@ -140,8 +155,10 @@ export default class Main extends Vue {
   openDialog(config: ModalConfig) {
     const { modal } = this.$refs;
     if (modal instanceof AppModal) {
-      modal.openDialog(config);
+      return modal.openDialog(config);
     }
+    console.error("Unexpected component", modal);
+    throw new Error("unexpected component.");
   }
   async updateList() {
     const inputs = await db.inputs
@@ -159,35 +176,6 @@ export default class Main extends Vue {
     var check = !this.allChecked;
     this.inputList.forEach(input => (input.isChecked = check));
   }
-  get selectedDates() {
-    return this.inputList
-      .filter(input => input.isChecked)
-      .map(input => input.date);
-  }
-  async mounted() {
-    const first = await db.inputs.orderBy("ymd").first();
-    const currentYmd = firstDayOfMonth(new Date());
-    let firstYmd;
-    if (first) {
-      firstYmd = firstDayOfMonth(first.ymd);
-    } else {
-      firstYmd = currentYmd;
-    }
-    let preYmd = firstYmd;
-    const ymdList = [];
-    while (preYmd <= currentYmd) {
-      ymdList.push(preYmd);
-      preYmd = new Date(preYmd.getFullYear(), preYmd.getMonth() + 1, 1);
-    }
-    this.baseDate = currentYmd;
-    this.allMonth = ymdList.map(ymd => {
-      return {
-        label: `${ymd.getFullYear()}/${ymd.getMonth() + 1}`,
-        value: ymd
-      };
-    });
-    this.updateList();
-  }
   async onCreateOrUpdate(newData: Input) {
     if (newData.id === undefined) {
       await db.inputs.add(toEntity(newData, this.baseDate));
@@ -199,15 +187,6 @@ export default class Main extends Vue {
   }
   async onDelete(id: number) {
     await db.inputs.delete(id);
-    this.updateList();
-    this.modal = false;
-  }
-  async onDeleteOk() {
-    var ids = this.inputList.reduce<number[]>((ids, input) => {
-      if (input.isChecked && input.id != null) ids.push(input.id);
-      return ids;
-    }, []);
-    await db.inputs.bulkDelete(ids);
     this.updateList();
     this.modal = false;
   }
@@ -224,6 +203,8 @@ export default class Main extends Vue {
     });
   }
   showBulkUpdateForm() {
+    if (!this.selectedDates.length) return;
+
     this.openDialog({
       title: "交通費入力",
       slot: "bulkUpdateForm",
@@ -237,11 +218,22 @@ export default class Main extends Vue {
       expandOnSp: true
     });
   }
-  showDeleteConfirm() {
-    this.openDialog({
-      slot: "deleteComfirm",
-      header: false
+  async showDeleteConfirm() {
+    if (!this.selectedDates.length) return;
+
+    const ok = await this.openDialog({
+      slot: "commonComfirm",
+      header: false,
+      other: "チェックしたデータを削除します。"
     });
+    if (ok) {
+      var ids = this.inputList.reduce<number[]>((ids, input) => {
+        if (input.isChecked && input.id != null) ids.push(input.id);
+        return ids;
+      }, []);
+      await db.inputs.bulkDelete(ids);
+      this.updateList();
+    }
   }
   async onBulkUpdate(update: { input: Input; info: UpdateInfo }) {
     const updateEntities = this.inputList
@@ -276,10 +268,34 @@ export default class Main extends Vue {
     this.baseDate = ym;
     this.updateList();
   }
-
   downloadPdf() {
     const date = this.baseDate;
     this.$router.push(`/pdf/${date.getFullYear()}/${date.getMonth() + 1}`);
+  }
+
+  async mounted() {
+    const first = await db.inputs.orderBy("ymd").first();
+    const currentYmd = firstDayOfMonth(new Date());
+    let firstYmd;
+    if (first) {
+      firstYmd = firstDayOfMonth(first.ymd);
+    } else {
+      firstYmd = currentYmd;
+    }
+    let preYmd = firstYmd;
+    const ymdList = [];
+    while (preYmd <= currentYmd) {
+      ymdList.push(preYmd);
+      preYmd = new Date(preYmd.getFullYear(), preYmd.getMonth() + 1, 1);
+    }
+    this.baseDate = currentYmd;
+    this.allMonth = ymdList.map(ymd => {
+      return {
+        label: `${ymd.getFullYear()}/${ymd.getMonth() + 1}`,
+        value: ymd
+      };
+    });
+    this.updateList();
   }
 }
 </script>
@@ -339,7 +355,7 @@ export default class Main extends Vue {
 
   &__icon {
     color: #2196f3;
-    font-size: 30px;
+    font-size: 44px;
     cursor: pointer;
     pointer-events: initial;
 
