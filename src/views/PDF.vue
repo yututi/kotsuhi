@@ -9,12 +9,8 @@
         <div style="text-align:center;">
           <h2>交通費請求書</h2>
         </div>
-        <div>
-          {{year}}年 {{month}}月度 
-        </div>
-        <div style="text-align:right;">
-          {{userName}}
-        </div>
+        <div>{{year}}年 {{month}}月度</div>
+        <div style="text-align:right;">{{userName}}</div>
       </div>
       <div class="sheet__body">
         <table>
@@ -54,7 +50,10 @@
             </thead>
             <tbody>
               <tr>
-                <td v-for="tran in Object.keys(transportations)" :key="tran">{{calcSumByTran(tran)}} 円</td>
+                <td
+                  v-for="tran in Object.keys(transportations)"
+                  :key="tran"
+                >{{calcSumByTran(tran)}} 円</td>
                 <td>{{sum}} 円</td>
               </tr>
             </tbody>
@@ -71,13 +70,10 @@
 <script lang="js">
 import db from "@/store";
 import { firstDayOfMonth, lastDayOfMonth } from "@/utils";
-import { TransportationTypes } from "@/types"
-import globalState from "@/globalStateModule"
+import { TransportationTypes, TransportationTypesMap } from "@/types"
+import { globalState } from "@/globalState"
 
-const tranMap = TransportationTypes.reduce((map, type) => {
-  map[type.value] = type.label;
-  return map;
-}, {});
+const tranMap = TransportationTypesMap;
 
 const ITEM_PER_PAGE = 30;
 const PAGE_SIZE = "A4"
@@ -116,9 +112,8 @@ export default {
         )
         .sortBy("date");
       this.allInputList = inputs.slice();
-      var page = 0;
       while(inputs.length) {
-        this.inputPerSectionList.push(inputs.splice(page * ITEM_PER_PAGE, page * ITEM_PER_PAGE + ITEM_PER_PAGE));
+        this.inputPerSectionList.push(inputs.splice(0, ITEM_PER_PAGE));
       }
     },
     transportationLabel(value) {
@@ -128,11 +123,12 @@ export default {
       return this.allInputList.filter(input => input.transportation === value).reduce((sum, input) => {return sum + input.cost}, 0).toLocaleString();
     }
   },
-  mounted: function() {
+  mounted: async function() {
     if(!document.body.classList.contains(PAGE_SIZE)){
         document.body.classList.add(PAGE_SIZE)
     }
-    this.init();
+    await this.init();
+    window.print();
   },
   beforeRouteLeave: function(f,t,n) {
     if(document.body.classList.contains(PAGE_SIZE)){
@@ -191,8 +187,6 @@ export default {
   &__body {
     flex: 1;
     overflow: hidden;
-  }
-  &__footer {
   }
 }
 

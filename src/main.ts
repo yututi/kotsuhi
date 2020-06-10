@@ -22,9 +22,11 @@ import {
   faSignOutAlt,
   // faDownload,
   faBars,
-  faFilePdf
+  faFilePdf,
+  faCalendar,
+  faCalendarAlt
 } from '@fortawesome/free-solid-svg-icons'
-import { faGoogle } from '@fortawesome/free-brands-svg-icons'
+// import { faGoogle } from '@fortawesome/free-brands-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
 library.add(
@@ -42,9 +44,10 @@ library.add(
   faSignOutAlt,
   // faDownload,
   faBars,
-  faFilePdf
+  faFilePdf,
+  faCalendarAlt
 )
-library.add(faGoogle)
+// library.add(faGoogle)
 
 Vue.config.productionTip = false
 Vue.component("fa-icon", FontAwesomeIcon)

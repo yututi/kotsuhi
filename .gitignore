@@ -21,6 +21,7 @@ yarn-error.log*
 *.sw?
 
 .firebaserc
-functions/
+# functions/
 .firebase/
 ui-debug.log
+.env.production

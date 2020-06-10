@@ -50,6 +50,12 @@ export const TransportationTypes = [
     }
 ]
 
+export const TransportationTypesMap = TransportationTypes.reduce((map, type) => {
+    map[type.value] = type.label;
+    return map;
+}, {} as { [key: string]: string });
+
+
 export function defaultInput(): Input {
     return {
         date: 1,
@@ -70,7 +76,7 @@ export interface ModalConfig {
     title?: string
     expandOnSp?: boolean
     header?: boolean,
-    other?:any
+    other?: any
 }
 
 const DefaultModalConfig: ModalConfig = {

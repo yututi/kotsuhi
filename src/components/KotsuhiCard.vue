@@ -75,10 +75,11 @@ export default class KotsuhiCard extends Vue {
   border-radius: 6px;
   padding: 6px;
   color: dimgray;
+  transition: background-color .1s;
 
   &:hover {
-    border-color: orange;
     box-shadow: 0 0 4px 1px gainsboro;
+    background-color: #fafcfc;
   }
 
   @include sp {

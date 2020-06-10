@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>交通費精算/PDF</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/paper-css/0.3.0/paper.css">
+  <style>
+    @import url("https://fonts.googleapis.com/css?family=Noto+Sans+JP:300&display=swap");
+
+    body {
+      font-family: Roboto, "Noto Sans JP", "Noto Sans JP", Arial, Helvetica, sans-serif;
+    }
+
+    .sheet {
+      font-size: 14px;
+      display: flex;
+      flex-direction: column;
+
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      border: 1px solid #333;
+      table-layout: fixed;
+    }
+
+    th,
+    td {
+      overflow: hidden;
+      text-align: center;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      border-collapse: collapse;
+      border: 1px solid #333;
+    }
+
+    th.date {
+      width: 10mm;
+    }
+
+    th.contact {
+      width: 20mm;
+    }
+
+    th.from {
+      width: 20mm;
+    }
+
+    th.to {
+      width: 20mm;
+    }
+
+    th.tran {
+      width: 15mm;
+    }
+
+    th.cost {
+      width: 15mm;
+    }
+
+
+    .sheet__header {
+      margin-bottom: 5mm;
+    }
+
+    .sheet__body {
+      flex: 1;
+      overflow: hidden;
+
+    }
+
+    .stamp-area {
+      margin-top: 5mm;
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .stamp-area__stamp {
+      margin-left: 3mm;
+      border: 1px solid black;
+      width: 30mm;
+      height: 30mm;
+      border-collapse: collapse;
+    }
+
+
+    @page {
+      size: A4;
+    }
+  </style>
+</head>
+
+<body class="A4">
+  <%inputPerSectionList.forEach(inputListPerSection=>{%>
+  <section class="sheet padding-10mm">
+    <div class="sheet__header">
+      <div style="text-align:center;">
+        <h2>交通費請求書</h2>
+      </div>
+      <div>
+        <%=year%>年 <%=month%>月度
+      </div>
+      <div style="text-align:right;">
+        <%=userName%>
+      </div>
+    </div>
+    <div class="sheet__body">
+      <table>
+        <thead>
+          <tr>
+            <th class="date">日</th>
+            <th class="contact">用務先</th>
+            <th class="from">出発</th>
+            <th class="to">到着</th>
+            <th class="tran">
+              交通手段
+            </th>
+            <th class="cost">交通費</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% inputListPerSection.forEach(input => { %>
+          <tr>
+            <td><%=`${month}/${input.date}` %></td>
+            <td><%=input.contact%></td>
+            <td><%=input.from%></td>
+            <td><%=input.to%></td>
+            <td><%=input.transportationDispVal%></td>
+            <td><%=input.cost?input.cost.toLocaleString():0%>円</td>
+          </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+    <div class="sheet__footer">
+      <div class="sum-area">
+        <table>
+          <thead>
+            <tr> 
+              <%sumOfTranList.forEach(sum=> {%>
+                <th><%=sum.label%></th>
+              <%})%>
+              <th>合計</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <%sumOfTranList.forEach(sum=> {%>
+                <td><%=sum.value%> 円</td>
+              <%})%>
+              <td><%=sum%> 円</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="stamp-area">
+        <div class="stamp-area__stamp"></div>
+        <div class="stamp-area__stamp"></div>
+      </div>
+    </div>
+  </section>
+  <%});%>
+</body>
+
+</html>

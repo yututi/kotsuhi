@@ -4,7 +4,9 @@
       <app-btn
         class="k-ym-select__selected k-input"
         :class="inputCls"
+        icon="calendar-alt"
         focusable
+        round
         @click="showPopover"
         :label="label"
       />
@@ -15,7 +17,7 @@
           <a class="k-month-arrow" @click="currentYear--">
             <fa-icon icon="caret-left" />
           </a>
-          <span>{{currentYear}}</span>
+          <span class="k-ym-options__year">{{currentYear}}</span>
           <a class="k-month-arrow" @click="currentYear++">
             <fa-icon icon="caret-right" />
           </a>
@@ -143,7 +145,6 @@ export default class Select extends Vue {
     cursor: pointer;
     border: 1px solid transparent;
     outline: none;
-    width: auto;
   }
 
   &--focused {
@@ -164,11 +165,16 @@ export default class Select extends Vue {
 
   &__header {
     width: 100%;
-    padding: 0.5em;
+    padding: 10px;
     display: flex;
     justify-content: space-around;
     align-items: center;
     user-select: none;
+    font-size: 26px;
+  }
+
+  &__year {
+    padding: 0px 5px;
   }
 }
 
@@ -182,14 +188,16 @@ export default class Select extends Vue {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 30px;
-  width: 30px;
-  border-radius: 4px;
-  font-size: 28px;
+  height: 36px;
+  width: 36px;
+  border-radius: 9px;
+  font-size: 36px;
   color: #2196f3;
+  transition: background-color .3s;
   &:hover {
     cursor: pointer;
-    background-color: gainsboro;
+    background-color: #2196f3;
+    color: white;
   }
 }
 </style>

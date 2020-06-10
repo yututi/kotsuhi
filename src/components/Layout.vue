@@ -1,14 +1,19 @@
 <template>
-  <div class="k-layout">
+  <div class="k-layout" :style="layoutStyles">
     <header class="k-layout__header" :class="headerClasses">
-      <app-btn class="k-hide-on-pc" icon="bars" round @click="showMenu = true"></app-btn>
+      <app-btn class="k-header__menu-icon" icon="bars" round @click="showMenu = true"></app-btn>
       <span class="k-layout__title">交通費精算</span>
       <div class="k-layout__left-items">
         <slot name="header-left-items" />
       </div>
       <div class="k-layout__sub-items-wrapper" :class="wrapperClasses" @click="showMenu = false"></div>
       <div class="k-layout__sub-items k-sub-items" :class="subMenuClasses">
-        <app-btn class="k-hide-on-pc" icon="times-circle" round @click="showMenu = false"></app-btn>
+        <app-btn
+          class="k-sub-items__close-icon"
+          icon="times-circle"
+          round
+          @click="showMenu = false"
+        ></app-btn>
         <slot name="header-sub-items" />
       </div>
 
@@ -26,6 +31,7 @@
 import { Component, Mixins, Prop } from "vue-property-decorator";
 import AppBtn from "@/components/Btn.vue";
 import Themeable from "@/components/mixins/themeable";
+import { isMobile } from "@/utils";
 
 @Component({
   components: {
@@ -36,7 +42,18 @@ export default class Layout extends Mixins(Themeable) {
   @Prop({ type: String, required: false, default: "" })
   label!: string;
 
+  height = 0;
+
   showMenu = false;
+
+  get layoutStyles() {
+    if (isMobile) {
+      return {
+        height: this.height + "px"
+      };
+    }
+    return {};
+  }
 
   get headerClasses() {
     return {
@@ -61,14 +78,28 @@ export default class Layout extends Mixins(Themeable) {
     this.$emit("click", e);
   }
 
-  mounted() {}
+  _listener?: EventListener | null;
+  mounted() {
+    if (isMobile) {
+      this.height = window.innerHeight;
+    }
+    this._listener = () => {
+      this.height = window.innerHeight;
+    };
+    window.addEventListener("resize", this._listener);
+  }
+  beforeDestroy() {
+    if (this._listener) window.removeEventListener("resize", this._listener);
+  }
 }
 </script>
 <style lang="scss">
 @import "../styles/base.scss";
 
 .k-layout {
-  height: 100vh;
+  @include pc {
+    height: 100vh;
+  }
   display: flex;
   flex-direction: column;
   &__header {
@@ -99,6 +130,9 @@ export default class Layout extends Mixins(Themeable) {
   }
 
   @include sp {
+    &__title {
+      padding: 0px 10px;
+    }
     &__header {
       position: relative;
     }
@@ -107,14 +141,16 @@ export default class Layout extends Mixins(Themeable) {
     }
   }
 }
-@include sp {
-  .k-layout__sub-items-wrapper {
+.k-layout__sub-items-wrapper {
+  margin-left: 5px;
+  @include sp {
     visibility: hidden;
+    margin-left: 0px;
     opacity: 0;
     transition: opacity 0.3s;
     position: fixed;
     top: 0px;
-    left: 0px;
+    left: 0px; // 親のボーター分左にずらす
     height: 100vh;
     width: 100%;
     background-color: rgba(0, 0, 0, 0.2);
@@ -147,11 +183,22 @@ export default class Layout extends Mixins(Themeable) {
     }
 
     &--show {
-      left: 0px;
+      left: -1px;
+    }
+  }
+
+  @include pc {
+    &__close-icon {
+      display: none;
     }
   }
 }
 .k-spacer {
   flex: 1;
+}
+.k-header__menu-icon {
+  @include pc {
+    display: none;
+  }
 }
 </style>

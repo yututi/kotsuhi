@@ -1,26 +1,27 @@
 <template>
   <div class="k-input-num">
-    <input v-if="isMobile" class="k-input-num__txt" type="number" :max="max" v-model="num" />
-    <input
-      v-else
-      class="k-input-num__txt"
-      type="text"
-      @keydown="validateNum"
-      v-model="num"
-    />
+    <input v-if="isMobile" class="k-input-num__txt" type="number" :max="max" v-model="numForMobile" />
+    <input v-else class="k-input-num__txt" type="text" @keydown="validateNum" v-model="num" />
   </div>
 </template>
 <script lang="ts">
-import { Component, Mixins, Prop } from "vue-property-decorator";
-import MobileCompatible from "@/components/mixins/mobileCompatible";
+import { Component, Vue, Prop } from "vue-property-decorator";
+import { isMobile } from "@/utils";
 
 @Component
-export default class InputNum extends Mixins(MobileCompatible) {
+export default class InputNum extends Vue {
   @Prop()
   value!: number;
 
   @Prop({ type: Number, default: 999999 })
   max!: number;
+
+  get numForMobile() {
+    return this.value;
+  }
+  set numForMobile(val) {
+    this.$emit("input", val);
+  }
 
   get num() {
     return this.value ? this.value.toLocaleString() : "";

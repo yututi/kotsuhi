@@ -10,7 +10,7 @@
 import { Component, Vue } from "vue-property-decorator";
 import AppModal from "@/components/Modal.vue";
 import AppCircular from "@/components/Circular.vue";
-import global from "@/globalStateModule";
+import { globalState } from "@/globalState";
 
 @Component({
   components: {
@@ -20,7 +20,7 @@ import global from "@/globalStateModule";
 })
 export default class App extends Vue {
   get isLoading() {
-    return global.isLoading;
+    return globalState.isLoading;
   }
 }
 </script>
