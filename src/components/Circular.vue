@@ -46,7 +46,7 @@ export default class ProgressCircle extends Mixins(Themeable) {
   get circleStyle() {
     return {
       "stroke-width": this.strokeWidth,
-      stroke: this.color
+      // stroke: this.color
     };
   }
 
@@ -72,6 +72,7 @@ $rotateTime: 1.5s;
   &--intermediate &__circler {
     fill: transparent;
     animation: dynamic-circumference $rotateTime infinite;
+    stroke: currentColor;
   }
 }
 

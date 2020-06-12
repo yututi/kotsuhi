@@ -1,16 +1,26 @@
 <template>
   <div class="btn" :class="btnClasses" :tabindex="focusable?0:-1" @click="onclick($event)">
-    <fa-icon v-if="icon" class="k-btn__icon" :icon="icon" />
-    <slot />
-    <span class="btn__label" v-if="label">{{label}}</span>
-    <div v-if="tooltip" class="k-tooltip__tooltiptext">{{tooltip}}</div>
+    <template v-if="isLoading">
+      <app-circular style="width:24px; height:24px;" color="white"></app-circular>
+    </template>
+    <template v-else>
+      <fa-icon v-if="icon" class="k-btn__icon" :icon="icon" />
+      <slot />
+      <span class="btn__label" v-if="label">{{label}}</span>
+      <div v-if="tooltip" class="k-tooltip__tooltiptext">{{tooltip}}</div>
+    </template>
   </div>
 </template>
 <script lang="ts">
 import { Component, Mixins, Prop } from "vue-property-decorator";
 import Themeable from "@/components/mixins/themeable";
+import AppCircular from "@/components/Circular.vue";
 
-@Component
+@Component({
+  components: {
+    AppCircular
+  }
+})
 export default class Btn extends Mixins(Themeable) {
   @Prop({ type: String, required: false, default: "" })
   label!: string;
@@ -33,19 +43,23 @@ export default class Btn extends Mixins(Themeable) {
   @Prop({ type: String, required: false, default: "" })
   tooltip!: string;
 
+  @Prop({ type: Boolean, default: false })
+  isLoading!: boolean;
+
   get btnClasses() {
     return {
       "btn--dark": this.dark,
       "btn--outline": this.outline,
       "btn--round": this.round,
       "btn--icon": this.icon,
+      "btn--is-loading": this.isLoading,
       "k-tooltip": !!this.tooltip,
       ...this.themeClasses
     };
   }
 
   onclick(e: any) {
-    this.$emit("click", e);
+    if (!this.isLoading) this.$emit("click", e);
   }
 }
 </script>
@@ -93,6 +107,12 @@ export default class Btn extends Mixins(Themeable) {
     }
   }
 
+  &--is-loading {
+    &:hover {
+      cursor: initial;
+    }
+  }
+
   & > *:not(:first-child) {
     margin-left: 4px;
   }
@@ -120,6 +140,10 @@ export default class Btn extends Mixins(Themeable) {
     &:active {
       color: map-get($theme, "color");
     }
+  }
+  .btn--is-loading.k-theme--#{$name}:hover {
+    background-color: map-get($theme, "bgColor");
+    border-color: map-get($theme, "bgColor");
   }
 }
 </style>

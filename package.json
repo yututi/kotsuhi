@@ -5,7 +5,7 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build --modern",
-    "b:em": "vue-cli-service build --report --mode development",
+    "b4e": "vue-cli-service build --report --mode development",
     "lint": "vue-cli-service lint",
     "b:w": "webpack --config ./build/webpack.config.worker.js --progress"
   },

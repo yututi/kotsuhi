@@ -7,7 +7,14 @@
       <app-user-select></app-user-select>
     </template>
     <template #header-right-items>
-      <app-btn icon="file-pdf" round label="PDF" @click="downloadPdf" />
+      <app-btn
+        v-if="isLoggedIn"
+        icon="file-pdf"
+        round
+        label="PDF"
+        :is-loading="isFileDownloading"
+        @click="downloadPdf"
+      />
       <form class="file-form" style="display:none;" :action="fileDownloadURL" method="POST">
         <input type="text" name="json" :value="fileDataJson" />
       </form>
@@ -93,7 +100,12 @@ import {
   UpdateInfo
 } from "@/types/index";
 import db from "@/store";
-import { firstDayOfMonth, lastDayOfMonth, isMobile } from "@/utils";
+import {
+  firstDayOfMonth,
+  lastDayOfMonth,
+  isMobile,
+  downloadBlob
+} from "@/utils";
 import { globalState } from "@/globalState";
 
 function fromEntity(entity: InputEntity): Input {
@@ -142,6 +154,9 @@ export default class Main extends Vue {
     return this.inputList
       .filter(input => input.isChecked)
       .map(input => input.date);
+  }
+  get isLoggedIn() {
+    return globalState.isLoggedIn;
   }
 
   onModBtnClicked(input: Input) {
@@ -269,9 +284,8 @@ export default class Main extends Vue {
     this.updateList();
   }
 
-  fileDownloadURL = process.env.VUE_APP_CLOUD_FUNCTION_BASE_URL + "api/genPdf";
-  fileDataJson = "{}";
-
+  // PDF出力
+  isFileDownloading = false;
   async downloadPdf() {
     const ok = await this.openDialog({
       slot: "commonComfirm",
@@ -280,57 +294,52 @@ export default class Main extends Vue {
     });
     if (!ok) return;
 
-    // 認証ユーザのみPDFダウンロード
-    // 未認証、オフラインユーザはprintで頑張ってもらう
-    if (globalState.isLoggedIn) {
-      this.fileDataJson = JSON.stringify({
-        year: this.baseDate.getFullYear(),
-        month: this.baseDate.getMonth() + 1,
-        userName: globalState.userName,
-        inputList: this.inputList
-      });
-
-      this.$nextTick(() => {
-        const formEl = this.$el.querySelector(".file-form") as HTMLFormElement;
-        formEl.submit();
-      });
-    } else {
-      if (isMobile) {
-        this.openDialog({
-          slot: "commonComfirm",
-          header: false,
-          other: "お使いの端末での未認証/オフライン印刷はサポートしていません。"
+    this.isFileDownloading = true;
+    try {
+      // 認証ユーザのみPDFダウンロード
+      // 未認証、オフラインユーザはprintで頑張ってもらう
+      if (globalState.isLoggedIn) {
+        const response = await fetch(
+          process.env.VUE_APP_CLOUD_FUNCTION_BASE_URL + "api/genPdf",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json; charset=utf-8"
+            },
+            mode: "cors",
+            cache: "no-cache",
+            body: JSON.stringify({
+              year: this.baseDate.getFullYear(),
+              month: this.baseDate.getMonth() + 1,
+              userName: globalState.userName,
+              inputList: this.inputList
+            })
+          }
+        );
+        var blob = await response.blob().catch(e => {
+          this.openDialog({
+            slot: "commonComfirm",
+            header: false,
+            other: "PDFファイルのダウンロードに失敗しました。"
+          });
         });
-        return;
+        if (blob) downloadBlob(blob, "交通費精算.pdf");
+      } else {
+        if (isMobile) {
+          this.openDialog({
+            slot: "commonComfirm",
+            header: false,
+            other:
+              "お使いの端末での未認証/オフライン印刷はサポートしていません。"
+          });
+          return;
+        }
+        var date = this.baseDate;
+        this.$router.push(`/pdf/${date.getFullYear()}/${date.getMonth() + 1}`);
       }
-      var date = this.baseDate;
-      this.$router.push(`/pdf/${date.getFullYear()}/${date.getMonth() + 1}`);
+    } finally {
+      this.isFileDownloading = false;
     }
-
-    // const response = await fetch(
-    //   process.env.VUE_APP_CLOUD_FUNCTION_BASE_URL + "genPdf",
-    //   {
-    //     method: "POST",
-    //     headers: {
-    //       "Content-Type": "application/json; charset=utf-8"
-    //     },
-    //     mode: "cors",
-    //     cache: "no-cache",
-    //     body: JSON.stringify({
-    //       baseDate: this.baseDate,
-    //       inputList: this.inputList
-    //     })
-    //   }
-    // );
-    // var blob = await response.blob();
-    // var url = window.URL.createObjectURL(blob);
-    // var a = document.createElement("a");
-    // a.href = url;
-    // console.log(url);
-    // a.download = "交通費精算.pdf";
-    // document.body.appendChild(a); // we need to append the element to the dom -> otherwise it will not work in firefox
-    // a.click();
-    // a.remove(); //afterwards we remove the element again
   }
 
   async mounted() {

@@ -23,8 +23,7 @@ import {
   // faDownload,
   faBars,
   faFilePdf,
-  faCalendar,
-  faCalendarAlt
+  faCalendar
 } from '@fortawesome/free-solid-svg-icons'
 // import { faGoogle } from '@fortawesome/free-brands-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
@@ -45,7 +44,7 @@ library.add(
   // faDownload,
   faBars,
   faFilePdf,
-  faCalendarAlt
+  faCalendar
 )
 // library.add(faGoogle)
 

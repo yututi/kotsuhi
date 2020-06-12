@@ -68,4 +68,6 @@ if (isProduction) {
         //     auth.signInWithRedirect(provider);
         // }
     });
+} else {
+    globalState.isAuthInit = true;
 }
